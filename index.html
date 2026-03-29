@@ -832,6 +832,11 @@ function toggleTheme() {
 function init() {
   const s = settings();
   if (!s || !s.halaqah) {
+    // Pastikan seluruh isian formulir setup kosong bersih jika tidak ada data sama sekali
+    document.getElementById('form-setup').reset(); 
+    document.getElementById('s-halaqah').value = '';
+    document.getElementById('s-musyrif').value = '';
+    document.getElementById('s-siswa').value = '';
     show('pg-setup'); hide('pg-app');
   } else {
     hide('pg-setup'); show('pg-app');
@@ -862,7 +867,12 @@ function resetApp() {
     if(r.isConfirmed) {
       localStorage.removeItem(SK);
       localStorage.removeItem(DK);
-      location.reload();
+      document.getElementById('form-setup').reset();
+      document.getElementById('s-halaqah').value = '';
+      document.getElementById('s-musyrif').value = '';
+      document.getElementById('s-siswa').value = '';
+      // Force reload bersih dari cache/hash URL
+      window.location.replace(window.location.pathname);
     }
   });
 }
@@ -1565,7 +1575,9 @@ function doImport(e) {
         const d = JSON.parse(ev.target.result);
         if(d.settings) localStorage.setItem(SK,JSON.stringify(d.settings));
         if(d.records)  saveRecords(d.records);
-        Swal.fire({icon:'success',title:'Berhasil!',text:'Data diimport.',timer:1500,showConfirmButton:false}).then(init);
+        Swal.fire({icon:'success',title:'Berhasil!',text:'Data diimport.',timer:1500,showConfirmButton:false}).then(() => {
+          window.location.replace(window.location.pathname);
+        });
       } catch { Swal.fire('Gagal','File JSON tidak valid.','error'); }
     };
     rd.readAsText(file);
@@ -1602,9 +1614,13 @@ function doImport(e) {
         saveRecords(recs);
         
         if(!importedSettings && !settings()) {
-          Swal.fire('Info','Riwayat setoran diimport. Silakan isi form pengaturan kelas untuk melanjutkan.','info').then(init);
+          Swal.fire('Info','Riwayat setoran diimport. Silakan isi form pengaturan kelas untuk melanjutkan.','info').then(() => {
+            window.location.replace(window.location.pathname);
+          });
         } else {
-          Swal.fire({icon:'success',title:'Berhasil!',text:'Data diimport.',timer:1500,showConfirmButton:false}).then(init);
+          Swal.fire({icon:'success',title:'Berhasil!',text:'Data diimport.',timer:1500,showConfirmButton:false}).then(() => {
+            window.location.replace(window.location.pathname);
+          });
         }
       } catch(err) { Swal.fire('Gagal','Gagal membaca file. Pastikan format sesuai.','error'); }
     };
