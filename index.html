@@ -5,6 +5,44 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Sijil Mutābaʿah</title>
 
+<!-- PWA / Standalone Web App Meta Tags -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Mutaba'ah">
+<meta id="meta-theme-color" name="theme-color" content="#faf6ee">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%231a5c5c'/%3E%3Ctext x='50%25' y='50%25' font-size='250' font-weight='bold' text-anchor='middle' alignment-baseline='central' fill='%23b8922a' font-family='serif'%3E%D8%B3%3C/text%3E%3C/svg%3E">
+
+<script>
+  // PWA Injector: Membangun manifest.json secara dinamis agar tetap 1 file
+  const manifestJSON = {
+    name: "Sijil Mutaba'ah",
+    short_name: "Mutaba'ah",
+    start_url: window.location.pathname,
+    display: "standalone",
+    background_color: "#faf6ee",
+    theme_color: "#1a5c5c",
+    icons: [{
+      src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%231a5c5c'/%3E%3Ctext x='50%25' y='50%25' font-size='250' font-weight='bold' text-anchor='middle' alignment-baseline='central' fill='%23b8922a' font-family='serif'%3E%D8%B3%3C/text%3E%3C/svg%3E",
+      sizes: "512x512",
+      type: "image/svg+xml",
+      purpose: "any maskable"
+    }]
+  };
+  const manifestBlob = new Blob([JSON.stringify(manifestJSON)], {type: 'application/manifest+json'});
+  const manifestLink = document.createElement('link');
+  manifestLink.rel = 'manifest';
+  manifestLink.href = URL.createObjectURL(manifestBlob);
+  document.head.appendChild(manifestLink);
+
+  // Service Worker Dummy agar Chrome mendeteksi web ini sebagai aplikasi installable (PWA)
+  if ('serviceWorker' in navigator) {
+    const swCode = `self.addEventListener('fetch', function(e) {});`;
+    const swBlob = new Blob([swCode], {type: 'application/javascript'});
+    navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>{});
+  }
+</script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Nunito:wght@300;400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
@@ -34,21 +72,21 @@
     --shadow: rgba(28, 20, 16, 0.08);
   }
   .dark {
-    --parchment: #0b1414; /* Latar belakang disesuaikan sedikit */
+    --parchment: #0b1414; 
     --cream: #111d1d;
-    --gold: #e2be61; /* Warna emas dicerahkan agar lebih menonjol */
+    --gold: #e2be61; 
     --gold-light: #f2d48a;
     --gold-pale: #223322;
-    --teal: #5cc7c7; /* Warna teal dicerahkan */
+    --teal: #5cc7c7; 
     --teal-dark: #3b9e9e;
     --teal-mid: #4cbdbd;
     --teal-light: #162b2b;
-    --ink: #fdfaf4; /* Teks utama putih cerah */
+    --ink: #fdfaf4; 
     --ink-mid: #e3dcd1;
-    --ink-soft: #b3a99b; /* PERBAIKAN: Teks sekunder (Juz/Ayat, Catatan) jauh lebih terang */
-    --ink-faint: #8a7f72; /* PERBAIKAN: Teks samar (Tanggal) & Ikon jauh lebih terang */
-    --white: #162424; /* Background Card sedikit dibedakan dari latar luar */
-    --border: #293d3d; /* Border diperjelas */
+    --ink-soft: #b3a99b; 
+    --ink-faint: #8a7f72; 
+    --white: #162424; 
+    --border: #293d3d; 
     --shadow: rgba(0, 0, 0, 0.4);
   }
 
@@ -188,6 +226,17 @@
     width: 100%;
   }
   .btn-ghost:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-light); }
+
+  /* Header Action Buttons (Dark Mode & Settings) */
+  .action-btn {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--white); border: 1.5px solid var(--border);
+    color: var(--ink-mid); cursor: pointer; display: flex;
+    align-items: center; justify-content: center;
+    box-shadow: 0 2px 8px var(--shadow);
+    transition: all 0.2s ease; font-size: 1.1rem; flex-shrink: 0;
+  }
+  .action-btn:hover { border-color: var(--gold); color: var(--gold); transform: scale(1.05); }
 
   /* Toggle */
   .toggle-wrap { display: flex; align-items: center; gap: 10px; cursor: pointer; }
@@ -334,18 +383,6 @@
   }
   .slide-in { animation: slideIn 0.35s cubic-bezier(.34,1.1,.64,1) forwards; }
 
-  /* Theme toggle button */
-  #theme-btn {
-    position: fixed; top: 16px; right: 16px; z-index: 200;
-    width: 42px; height: 42px; border-radius: 50%;
-    background: var(--white); border: 1.5px solid var(--border);
-    color: var(--ink-mid); cursor: pointer; display: flex;
-    align-items: center; justify-content: center;
-    box-shadow: 0 2px 12px var(--shadow);
-    transition: all 0.2s ease; font-size: 1.1rem;
-  }
-  #theme-btn:hover { border-color: var(--gold); color: var(--gold); }
-
   /* Scrollbar */
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-thumb { background: var(--ink-faint); border-radius: 4px; }
@@ -379,15 +416,17 @@
 </head>
 <body>
 
-<!-- Theme Toggle -->
-<button id="theme-btn" onclick="toggleTheme()" title="Ganti tema">
-  <i id="theme-icon" class="ph-bold ph-moon"></i>
-</button>
-
 <!-- =========================================
      HALAMAN SETUP
      ========================================= -->
 <section id="pg-setup" class="hidden min-h-screen flex items-center justify-center p-5 relative z-10">
+  <!-- Theme Toggle Setup Page -->
+  <div class="absolute top-5 right-5">
+    <button class="action-btn" onclick="toggleTheme()" title="Ganti tema">
+      <i id="theme-icon-setup" class="ph-bold ph-moon"></i>
+    </button>
+  </div>
+
   <div class="card w-full max-w-md p-8 fade-up mt-10" style="--card-accent: var(--teal)">
     <div class="geo-corner tl"></div>
     <div class="geo-corner br"></div>
@@ -404,7 +443,7 @@
     <form id="form-setup" class="space-y-4">
       <div>
         <label class="field-label">Nama Halaqah</label>
-        <input id="s-halaqah" type="text" class="field" placeholder="Cth: Halaqah Abu Bakar As-Siddiq" required>
+        <input id="s-halaqah" type="text" class="field" placeholder="Cth: Halaqah Abu Bakar" required>
       </div>
       <div>
         <label class="field-label">Nama Musyrif</label>
@@ -412,7 +451,7 @@
       </div>
       <div>
         <label class="field-label">Daftar Santri <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--ink-faint);">(satu nama per baris)</span></label>
-        <textarea id="s-siswa" rows="5" class="field resize-none" placeholder="Ahmad&#10;Zaid ibn Tsabit&#10;Abdullah ibn Mas'ud" required></textarea>
+        <textarea id="s-siswa" rows="5" class="field resize-none" placeholder="Ahmad&#10;Zaid&#10;Umar" required></textarea>
       </div>
       <button type="submit" class="btn-primary mt-2" style="margin-top:8px">
         <i class="ph-bold ph-arrow-right"></i> Mulai Gunakan
@@ -436,18 +475,23 @@
 
   <!-- Header -->
   <header class="max-w-2xl mx-auto px-5 pt-6 pb-3 flex items-start justify-between">
-    <div class="flex-1 pr-14">
+    <div class="flex-1 pr-4">
       <p class="font-arabic text-base" style="color:var(--gold);direction:rtl;text-align:left;">حفظ القرآن الكريم</p>
       <h1 id="disp-halaqah" class="font-display text-2xl font-bold leading-tight" style="color:var(--ink)">Halaqah</h1>
       <p class="text-xs mt-1 flex items-center gap-1.5" style="color:var(--teal)">
         <i class="ph-fill ph-user-circle text-base"></i>
-        <span id="disp-musyrif" class="font-semibold">Musyrif</span>
+        <span id="disp-musyrif" class="font-semibold truncate">Musyrif</span>
       </p>
     </div>
-    <button onclick="openSettings()" class="mt-1 w-9 h-9 flex items-center justify-center rounded-full"
-      style="background:var(--cream);border:1.5px solid var(--border);color:var(--ink-soft)">
-      <i class="ph-bold ph-gear"></i>
-    </button>
+    <!-- Tombol Header -->
+    <div class="flex items-center gap-2 mt-1">
+      <button class="action-btn" onclick="toggleTheme()" title="Ganti Tema">
+        <i id="theme-icon-main" class="ph-bold ph-moon"></i>
+      </button>
+      <button class="action-btn" onclick="openSettings()" title="Pengaturan">
+        <i class="ph-bold ph-gear"></i>
+      </button>
+    </div>
   </header>
 
   <main class="max-w-2xl mx-auto px-5 pb-28">
@@ -458,10 +502,10 @@
       <!-- Edit mode banner -->
       <div id="edit-banner">
         <i class="ph-bold ph-pencil-simple text-amber-600"></i>
-        Mode Edit — <button onclick="cancelEdit()" class="underline font-bold">Batal</button>
+        Mode Edit — <button type="button" onclick="cancelEdit()" class="underline font-bold bg-transparent border-none p-0 cursor-pointer">Batal</button>
       </div>
 
-      <div class="card p-6">
+      <div class="card p-5 sm:p-6">
         <div class="flex items-center gap-3 mb-5">
           <div style="width:36px;height:36px;background:var(--teal-light);border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--teal)">
             <i class="ph-bold ph-notebook-text text-lg"></i>
@@ -474,11 +518,11 @@
 
         <form id="form-setoran" autocomplete="off" class="space-y-4">
           <!-- Siswa & Tanggal -->
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label class="field-label">Santri</label>
               <select id="f-nama" required class="field">
-                <option value="" disabled selected>— Pilih —</option>
+                <option value="" disabled selected>— Pilih Santri —</option>
               </select>
             </div>
             <div>
@@ -501,13 +545,12 @@
           <div class="grid grid-cols-3 gap-3">
             <div class="col-span-2 relative">
               <label class="field-label">Surah</label>
-              <input id="f-surah-a" type="text" class="field" placeholder="Ketik nama surah…" required>
+              <input id="f-surah-a" type="text" class="field" placeholder="Nama surah…" required>
               <div id="err-surah-a" class="field-error">⚠ Nama surah tidak dikenali</div>
               <div id="ac-surah-a" class="autocomplete-list"></div>
             </div>
             <div>
               <label class="field-label">Ayat</label>
-              <!-- Menambahkan atribut required -->
               <input id="f-ayat-a" type="text" class="field" placeholder="1-5" required>
             </div>
           </div>
@@ -521,10 +564,10 @@
           </div>
 
           <!-- Surah Akhir (hidden by default) -->
-          <div id="blok-lintas" class="hidden grid grid-cols-3 gap-3 p-4 rounded-2xl" style="background:var(--cream);border:1px solid var(--border)">
+          <div id="blok-lintas" class="hidden grid grid-cols-3 gap-3 p-3 sm:p-4 rounded-xl sm:rounded-2xl" style="background:var(--cream);border:1px solid var(--border)">
             <div class="col-span-2 relative">
               <label class="field-label">Sampai Surah</label>
-              <input id="f-surah-b" type="text" class="field" placeholder="Surah terakhir…">
+              <input id="f-surah-b" type="text" class="field" placeholder="Surah akhir…">
               <div id="err-surah-b" class="field-error">⚠ Nama surah tidak dikenali</div>
               <div id="ac-surah-b" class="autocomplete-list"></div>
             </div>
@@ -535,13 +578,12 @@
           </div>
 
           <!-- Juz, Nilai, Catatan -->
-          <div class="grid grid-cols-3 gap-3">
-            <div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div class="col-span-1">
               <label class="field-label">Juz</label>
-              <!-- Diubah tipenya ke "text" agar bisa otomatis terisi seperti "29-30" -->
-              <input id="f-juz" type="text" class="field" placeholder="Cth: 30" required>
+              <input id="f-juz" type="text" class="field" placeholder="30" required>
             </div>
-            <div>
+            <div class="col-span-1">
               <label class="field-label">Nilai</label>
               <select id="f-gred" required class="field">
                 <option value="Mumtaz">Mumtaz (A)</option>
@@ -550,13 +592,13 @@
                 <option value="Maqbul">Maqbul (D)</option>
               </select>
             </div>
-            <div>
+            <div class="col-span-2 sm:col-span-1">
               <label class="field-label">Catatan</label>
               <input id="f-catatan" type="text" class="field" placeholder="Opsional">
             </div>
           </div>
 
-          <button type="submit" id="btn-simpan" class="btn-primary">
+          <button type="submit" id="btn-simpan" class="btn-primary mt-2">
             <i id="btn-simpan-icon" class="ph-bold ph-floppy-disk"></i>
             <span id="btn-simpan-teks">Simpan Setoran</span>
           </button>
@@ -617,7 +659,7 @@
           <p id="modal-count" class="text-xs font-semibold" style="color:var(--teal)">0 Setoran</p>
         </div>
       </div>
-      <button onclick="closeModal()" class="w-8 h-8 flex items-center justify-center rounded-full" style="background:var(--cream);color:var(--ink-soft)">
+      <button onclick="closeModal()" class="w-8 h-8 flex items-center justify-center rounded-full" style="background:var(--cream);color:var(--ink-soft);border:none;cursor:pointer;">
         <i class="ph-bold ph-x"></i>
       </button>
     </div>
@@ -754,14 +796,26 @@ function fmtDate(d) {
   const sys = window.matchMedia('(prefers-color-scheme: dark)').matches;
   if(t==='dark'||(t===undefined&&sys)) {
     document.documentElement.classList.add('dark');
-    document.addEventListener('DOMContentLoaded',()=>{ document.getElementById('theme-icon').className='ph-bold ph-sun'; });
+    document.addEventListener('DOMContentLoaded',()=>{ 
+      const ic1 = document.getElementById('theme-icon-main');
+      const ic2 = document.getElementById('theme-icon-setup');
+      if(ic1) ic1.className='ph-bold ph-sun'; 
+      if(ic2) ic2.className='ph-bold ph-sun'; 
+      const metaTheme = document.getElementById('meta-theme-color');
+      if (metaTheme) metaTheme.setAttribute('content', '#0b1414');
+    });
   }
 })();
 
 function toggleTheme() {
   const d = document.documentElement.classList.toggle('dark');
   localStorage.theme = d ? 'dark' : 'light';
-  document.getElementById('theme-icon').className = d ? 'ph-bold ph-sun' : 'ph-bold ph-moon';
+  const ic1 = document.getElementById('theme-icon-main');
+  const ic2 = document.getElementById('theme-icon-setup');
+  if(ic1) ic1.className = d ? 'ph-bold ph-sun' : 'ph-bold ph-moon';
+  if(ic2) ic2.className = d ? 'ph-bold ph-sun' : 'ph-bold ph-moon';
+  const metaTheme = document.getElementById('meta-theme-color');
+  if (metaTheme) metaTheme.setAttribute('content', d ? '#0b1414' : '#faf6ee');
 }
 
 // ─── INIT ───────────────────────────────────
@@ -893,12 +947,10 @@ document.getElementById('f-ayat-b').addEventListener('blur', () => {
 });
 
 // ─── PENGISIAN JUZ OTOMATIS ─────────────────
-// Fungsi bantuan untuk menghitung Juz berdasarkan Surah dan Ayat
 function hitungJuz(surahName, ayatInput) {
   const sData = SURAH_DATA.find(s => s.n === surahName);
   if (!sData) return null;
 
-  // Jika tidak ada input ayat, kembalikan rentang juz penuh untuk surah tersebut
   if (!ayatInput) {
     return { start: sData.js, end: sData.je };
   }
@@ -909,92 +961,30 @@ function hitungJuz(surahName, ayatInput) {
   const minAyat = Math.min(...nums.map(Number));
   const maxAyat = Math.max(...nums.map(Number));
 
-  // Logika Khusus: Al-Baqarah (karena membentang Juz 1, 2, 3)
   if (surahName === "Al-Baqarah") {
-    let startJuz = 1;
-    let endJuz = 1;
-
-    if (minAyat <= 141) startJuz = 1;
-    else if (minAyat <= 252) startJuz = 2;
-    else startJuz = 3;
-
-    if (maxAyat <= 141) endJuz = 1;
-    else if (maxAyat <= 252) endJuz = 2;
-    else endJuz = 3;
-
+    let startJuz = 1; let endJuz = 1;
+    if (minAyat <= 141) startJuz = 1; else if (minAyat <= 252) startJuz = 2; else startJuz = 3;
+    if (maxAyat <= 141) endJuz = 1; else if (maxAyat <= 252) endJuz = 2; else endJuz = 3;
     return { start: startJuz, end: endJuz };
   }
   
-  // Logika Khusus: Ali 'Imran (Juz 3 dan 4)
   if (surahName === "Ali 'Imran") {
-    let startJuz = 3;
-    let endJuz = 3;
-    
-    if (minAyat <= 92) startJuz = 3;
-    else startJuz = 4;
-    
-    if (maxAyat <= 92) endJuz = 3;
-    else endJuz = 4;
-    
-    return { start: startJuz, end: endJuz };
+    return { start: (minAyat <= 92) ? 3 : 4, end: (maxAyat <= 92) ? 3 : 4 };
   }
 
-  // Logika Khusus: An-Nisa' (Juz 4, 5, 6)
   if (surahName === "An-Nisa'") {
-    let startJuz = 4;
-    let endJuz = 4;
-    if (minAyat <= 23) startJuz = 4;
-    else if (minAyat <= 147) startJuz = 5;
-    else startJuz = 6;
-
-    if (maxAyat <= 23) endJuz = 4;
-    else if (maxAyat <= 147) endJuz = 5;
-    else endJuz = 6;
+    let startJuz = 4; let endJuz = 4;
+    if (minAyat <= 23) startJuz = 4; else if (minAyat <= 147) startJuz = 5; else startJuz = 6;
+    if (maxAyat <= 23) endJuz = 4; else if (maxAyat <= 147) endJuz = 5; else endJuz = 6;
     return { start: startJuz, end: endJuz };
   }
   
-  // Logika Khusus: Al-Ma'idah (Juz 6, 7)
-  if (surahName === "Al-Ma'idah") {
-     return { 
-       start: (minAyat <= 81) ? 6 : 7, 
-       end: (maxAyat <= 81) ? 6 : 7 
-     };
-  }
-  
-  // Logika Khusus: Al-An'am (Juz 7, 8)
-  if (surahName === "Al-An'am") {
-     return { 
-       start: (minAyat <= 110) ? 7 : 8, 
-       end: (maxAyat <= 110) ? 7 : 8 
-     };
-  }
+  if (surahName === "Al-Ma'idah") { return { start: (minAyat <= 81) ? 6 : 7, end: (maxAyat <= 81) ? 6 : 7 }; }
+  if (surahName === "Al-An'am") { return { start: (minAyat <= 110) ? 7 : 8, end: (maxAyat <= 110) ? 7 : 8 }; }
+  if (surahName === "Al-A'raf") { return { start: (minAyat <= 87) ? 8 : 9, end: (maxAyat <= 87) ? 8 : 9 }; }
+  if (surahName === "Al-Anfal") { return { start: (minAyat <= 40) ? 9 : 10, end: (maxAyat <= 40) ? 9 : 10 }; }
+  if (surahName === "At-Taubah") { return { start: (minAyat <= 92) ? 10 : 11, end: (maxAyat <= 92) ? 10 : 11 }; }
 
-  // Logika Khusus: Al-A'raf (Juz 8, 9)
-  if (surahName === "Al-A'raf") {
-     return { 
-       start: (minAyat <= 87) ? 8 : 9, 
-       end: (maxAyat <= 87) ? 8 : 9 
-     };
-  }
-
-  // Logika Khusus: Al-Anfal (Juz 9, 10)
-  if (surahName === "Al-Anfal") {
-     return { 
-       start: (minAyat <= 40) ? 9 : 10, 
-       end: (maxAyat <= 40) ? 9 : 10 
-     };
-  }
-
-  // Logika Khusus: At-Taubah (Juz 10, 11)
-  if (surahName === "At-Taubah") {
-     return { 
-       start: (minAyat <= 92) ? 10 : 11, 
-       end: (maxAyat <= 92) ? 10 : 11 
-     };
-  }
-
-  // Logika umum untuk surah lainnya (menggunakan start/end juz bawaan surah)
-  // Untuk surah yang hanya berada di 1 juz, ini sudah cukup akurat.
   return { start: sData.js, end: sData.je };
 }
 
@@ -1065,12 +1055,10 @@ function gotoTab(t) {
 }
 
 // ─── SIMPAN / UPDATE SETORAN ─────────────────
-
-// Mencegah submit form saat menekan tombol "Enter" pada kolom input
 document.getElementById('form-setoran').addEventListener('keydown', function(e) {
   if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
     e.preventDefault();
-    e.target.blur(); // Menghilangkan fokus dari input untuk memicu auto-check ayat
+    e.target.blur(); 
   }
 });
 
@@ -1378,7 +1366,6 @@ function doBackup(fmt) {
   const fn = 'Backup_'+s.halaqah.replace(/\s+/g,'_');
   
   if (fmt==='json') {
-    // Logika Blob untuk memastikan JSON terunduh otomatis
     const blob = new Blob([JSON.stringify({settings:s,records:d})], {type: "application/json"});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
