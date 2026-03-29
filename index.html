@@ -832,7 +832,6 @@ function toggleTheme() {
 function init() {
   const s = settings();
   if (!s || !s.halaqah) {
-    // Pastikan seluruh isian formulir setup kosong bersih jika tidak ada data sama sekali
     document.getElementById('form-setup').reset(); 
     document.getElementById('s-halaqah').value = '';
     document.getElementById('s-musyrif').value = '';
@@ -867,12 +866,7 @@ function resetApp() {
     if(r.isConfirmed) {
       localStorage.removeItem(SK);
       localStorage.removeItem(DK);
-      document.getElementById('form-setup').reset();
-      document.getElementById('s-halaqah').value = '';
-      document.getElementById('s-musyrif').value = '';
-      document.getElementById('s-siswa').value = '';
-      // Force reload bersih dari cache/hash URL
-      window.location.replace(window.location.pathname);
+      init();
     }
   });
 }
@@ -1478,7 +1472,7 @@ function exportPDFDirect(nama, startRange, endRange) {
 }
 
 function exportPDFFromModal() { 
-  const nama = modalStudent;
+  const nama = modalStudent; // Simpan nilai modalStudent ke variabel lokal sebelum memanggil closeModal()
   closeModal(); 
   promptDateRange((s,e) => exportPDFDirect(nama, s, e)); 
 }
@@ -1576,7 +1570,7 @@ function doImport(e) {
         if(d.settings) localStorage.setItem(SK,JSON.stringify(d.settings));
         if(d.records)  saveRecords(d.records);
         Swal.fire({icon:'success',title:'Berhasil!',text:'Data diimport.',timer:1500,showConfirmButton:false}).then(() => {
-          window.location.replace(window.location.pathname);
+          init();
         });
       } catch { Swal.fire('Gagal','File JSON tidak valid.','error'); }
     };
@@ -1615,11 +1609,11 @@ function doImport(e) {
         
         if(!importedSettings && !settings()) {
           Swal.fire('Info','Riwayat setoran diimport. Silakan isi form pengaturan kelas untuk melanjutkan.','info').then(() => {
-            window.location.replace(window.location.pathname);
+            init();
           });
         } else {
           Swal.fire({icon:'success',title:'Berhasil!',text:'Data diimport.',timer:1500,showConfirmButton:false}).then(() => {
-            window.location.replace(window.location.pathname);
+            init();
           });
         }
       } catch(err) { Swal.fire('Gagal','Gagal membaca file. Pastikan format sesuai.','error'); }
