@@ -1153,7 +1153,7 @@ function cancelEdit() {
 
 // ─── STORAGE WARNING ────────────────────────
 function checkStorage() {
-  const size = JSON.stringify(localStorage).length;
+  const size = new Blob([JSON.stringify(localStorage)]).size;
   if (size > 4 * 1024 * 1024) {
     Swal.mixin({toast:true,position:'top-end',showConfirmButton:false,timer:4000})
       .fire({icon:'warning',title:'⚠️ Penyimpanan hampir penuh. Segera backup data Anda.'});
@@ -1176,26 +1176,39 @@ function renderCards() {
     const pd    = d.filter(r=>r.nama===nama).sort((a,b)=>b.ts-a.ts);
     const count = pd.length;
     const last  = count ? fmtDate(pd[0].tarikh) : 'Belum ada setoran';
-    const div   = document.createElement('div');
-    const safeNamaJS = nama.replace(/'/g,"\\'");
+    
+    const div = document.createElement('div');
     div.className = 'student-card fade-up';
     div.style.animationDelay = (i*40)+'ms';
     div.style.animationFillMode = 'both';
     div.innerHTML = `
       <div class="avatar" style="background:linear-gradient(135deg,var(--teal),var(--teal-dark))">${escapeHtml(nama).charAt(0).toUpperCase()}</div>
-      <div class="flex-1 min-w-0" onclick="openModal('${safeNamaJS}')">
+      <div class="flex-1 min-w-0 student-clickable-area" style="cursor:pointer">
         <p class="font-semibold truncate" style="color:var(--ink)">${escapeHtml(nama)}</p>
         <p class="text-xs mt-0.5 truncate" style="color:var(--ink-soft)">
           <span style="color:var(--teal);font-weight:700">${count}</span> setoran &nbsp;·&nbsp; Terakhir: ${escapeHtml(last)}
         </p>
       </div>
-      <button onclick="event.stopPropagation(); promptDateRange((s,e) => exportPDFDirect('${safeNamaJS}', s, e))"
+      <button class="student-export-btn"
         style="flex-shrink:0;width:36px;height:36px;border-radius:10px;background:#fee2e2;border:none;cursor:pointer;color:#dc2626;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:background 0.2s"
         onmouseover="this.style.background='#fca5a5'" onmouseout="this.style.background='#fee2e2'"
         title="Cetak PDF">
         <i class="ph-bold ph-file-pdf"></i>
       </button>
     `;
+    
+    div.querySelector('.student-clickable-area').dataset.nama = nama;
+    div.querySelector('.student-clickable-area').addEventListener('click', function() {
+      openModal(this.dataset.nama);
+    });
+    
+    div.querySelector('.student-export-btn').dataset.nama = nama;
+    div.querySelector('.student-export-btn').addEventListener('click', function(e) {
+      e.stopPropagation();
+      const n = this.dataset.nama;
+      promptDateRange((start, end) => exportPDFDirect(n, start, end));
+    });
+    
     container.appendChild(div);
   });
 }
@@ -1214,9 +1227,7 @@ function openModal(nama) {
     box.innerHTML = `<div class="text-center py-10"><i class="ph-duotone ph-folder-dashed text-4xl" style="color:var(--ink-faint)"></i><p class="mt-2 text-sm" style="color:var(--ink-soft)">Belum ada riwayat.</p></div>`;
   } else {
     d.forEach(h => {
-      const tgl  = fmtDate(h.tarikh);
-      const safeId = h.id.replace(/'/g,"\\'");
-      const sn   = nama.replace(/'/g,"\\'");
+      const tgl = fmtDate(h.tarikh);
       box.insertAdjacentHTML('beforeend', `
         <div class="history-item">
           <div class="flex items-start justify-between gap-2">
@@ -1226,8 +1237,8 @@ function openModal(nama) {
             </div>
             <div class="flex items-center gap-2 flex-shrink-0">
               <span class="${badgeClass(h.gred)}">${escapeHtml(h.gred)}</span>
-              <button onclick="doEdit('${safeId}')" style="color:var(--ink-soft);background:none;border:none;cursor:pointer;font-size:1rem;padding:2px" title="Edit"><i class="ph-bold ph-pencil-simple"></i></button>
-              <button onclick="doDelete('${safeId}','${sn}')" style="color:var(--ink-soft);background:none;border:none;cursor:pointer;font-size:1rem;padding:2px" title="Hapus"
+              <button data-action="edit" data-id="${escapeHtml(h.id)}" style="color:var(--ink-soft);background:none;border:none;cursor:pointer;font-size:1rem;padding:2px" title="Edit"><i class="ph-bold ph-pencil-simple"></i></button>
+              <button data-action="delete" data-id="${escapeHtml(h.id)}" data-nama="${escapeHtml(nama)}" style="color:var(--ink-soft);background:none;border:none;cursor:pointer;font-size:1rem;padding:2px" title="Hapus"
                 onmouseover="this.style.color='#dc2626'" onmouseout="this.style.color='var(--ink-soft)'"><i class="ph-bold ph-trash"></i></button>
             </div>
           </div>
@@ -1242,6 +1253,19 @@ function openModal(nama) {
   }
   show('modal-overlay');
 }
+
+document.getElementById('modal-body').addEventListener('click', function(e) {
+  const btn = e.target.closest('button[data-action]');
+  if (!btn) return;
+  const action = btn.dataset.action;
+  const id = btn.dataset.id;
+  if (action === 'edit') {
+    doEdit(id);
+  } else if (action === 'delete') {
+    const nama = btn.dataset.nama;
+    doDelete(id, nama);
+  }
+});
 
 function closeModal() {
   hide('modal-overlay');
@@ -1376,6 +1400,9 @@ function makePDF(elId, filename) {
   }).from(el).save().then(()=>{
     el.style.position='absolute'; el.style.left='-9999px';
     Swal.close();
+  }).catch(() => {
+    el.style.position='absolute'; el.style.left='-9999px';
+    Swal.fire({icon:'error', title:'Error', text:'PDF tidak berhasil dibuat. Coba lagi.', customClass:{popup:'font-nunito'}});
   });
 }
 
@@ -1441,8 +1468,9 @@ function exportPDFDirect(nama, startRange, endRange) {
 }
 
 function exportPDFFromModal() { 
-  closeModal(); // Tutup modal dulu agar UI tidak bertumpuk
-  promptDateRange((s,e) => exportPDFDirect(modalStudent, s, e)); 
+  const nama = modalStudent;
+  closeModal(); 
+  promptDateRange((s,e) => exportPDFDirect(nama, s, e)); 
 }
 
 // ─── MAIN EXPORT ────────────────────────────
@@ -1502,12 +1530,12 @@ function doBackup(fmt) {
     rows = d.map((r, i) => {
       let base = {Tanggal:r.tarikh,Nama:r.nama,Jenis:r.jenis,Surah:r.surah,Ayat:r.ayat,Juz:r.juz,Nilai:r.gred,Catatan:r.catatan};
       if (i === 0) {
-        base.Halaqah = s.halaqah; base.Musyrif = s.musyrif; base.DaftarSiswa = JSON.stringify(s.siswa);
+        base.Halaqah = s.halaqah; base.Musyrif = s.musyrif; base.DaftarSiswa = JSON.stringify(s.siswa); base.__type = "SETTINGS";
       }
       return base;
     });
     if (rows.length === 0) {
-      rows.push({Tanggal:'',Nama:'',Jenis:'',Surah:'',Ayat:'',Juz:'',Nilai:'',Catatan:'',Halaqah:s.halaqah,Musyrif:s.musyrif,DaftarSiswa:JSON.stringify(s.siswa)});
+      rows.push({Tanggal:'',Nama:'',Jenis:'',Surah:'',Ayat:'',Juz:'',Nilai:'',Catatan:'',Halaqah:s.halaqah,Musyrif:s.musyrif,DaftarSiswa:JSON.stringify(s.siswa),__type:"SETTINGS"});
     }
   } else {
     rows = d.map(r=>({Tanggal:r.tarikh,Nama:r.nama,Jenis:r.jenis,Surah:r.surah,Ayat:r.ayat,Juz:r.juz,Nilai:r.gred,Catatan:r.catatan}));
@@ -1549,7 +1577,7 @@ function doImport(e) {
         const rows = XLSX.utils.sheet_to_json(wb.Sheets[sn]);
         
         let importedSettings = null;
-        const settingsRow = rows.find(r => r.Halaqah && r.Musyrif); 
+        const settingsRow = rows.find(r => r.__type === "SETTINGS"); 
         if (settingsRow) {
           importedSettings = {
             halaqah: settingsRow.Halaqah,
@@ -1563,7 +1591,7 @@ function doImport(e) {
         
         if (importedSettings) localStorage.setItem(SK, JSON.stringify(importedSettings));
 
-        const recs = rows.map(r=>({
+        const recs = rows.filter(r => r.__type !== "SETTINGS").map(r=>({
           id:uid(), ts:Date.now(),
           tarikh:r.Tanggal||r.tarikh, nama:r.Nama||r.nama,
           jenis:r.Jenis||r.jenis, surah:r.Surah||r.surah,
