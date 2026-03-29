@@ -390,6 +390,7 @@
   /* SweetAlert overrides */
   .swal2-popup { font-family: 'Nunito', sans-serif !important; border-radius: 20px !important; }
   .swal2-title { font-family: 'Playfair Display', serif !important; }
+  .swal2-html-container { font-family: 'Nunito', sans-serif !important; }
 
   /* Error text */
   .field-error { font-size: 0.72rem; color: #dc2626; margin-top: 4px; display: none; }
@@ -463,6 +464,13 @@
       <input type="file" id="import-file" accept=".json,.csv,.xlsx" class="hidden" onchange="doImport(event)">
       <button class="btn-ghost" onclick="document.getElementById('import-file').click()">
         <i class="ph-bold ph-upload-simple"></i> Import Data (JSON / XLSX / CSV)
+      </button>
+    </div>
+
+    <!-- FITUR RESET APLIKASI -->
+    <div class="mt-4 pt-4 text-center" style="border-top:1px dashed var(--border)">
+      <button type="button" onclick="resetApp()" class="text-xs font-bold" style="color:#dc2626; background:none; border:none; cursor:pointer;">
+        <i class="ph-bold ph-warning-octagon"></i> Reset Aplikasi (Hapus Semua)
       </button>
     </div>
   </div>
@@ -685,6 +693,7 @@
       <div style="display:flex;justify-content:center;gap:24px;font-size:13px;margin-top:8px;color:#4a3f35">
         <span>Halaqah: <strong id="pg-halaqah"></strong></span>
         <span>Musyrif: <strong id="pg-musyrif"></strong></span>
+        <span>Periode: <strong id="pg-periode">Semua Waktu</strong></span>
       </div>
     </div>
     <table class="pdf-tbl"><thead><tr>
@@ -699,7 +708,8 @@
       <div style="margin-top:12px;text-align:left;background:#faf6ee;padding:12px 16px;border:1px solid #e8dfd0;border-radius:8px;font-size:13px;color:#4a3f35">
         <p style="margin:0 0 4px">Nama Santri : <strong id="pp-nama" style="font-size:15px;color:#1a5c5c"></strong></p>
         <p style="margin:0 0 4px">Halaqah &nbsp;&nbsp;&nbsp;&nbsp;: <strong id="pp-halaqah"></strong></p>
-        <p style="margin:0">Musyrif &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <strong id="pp-musyrif"></strong></p>
+        <p style="margin:0 0 4px">Musyrif &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <strong id="pp-musyrif"></strong></p>
+        <p style="margin:0">Periode &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <strong id="pp-periode">Semua Waktu</strong></p>
       </div>
     </div>
     <table class="pdf-tbl"><thead><tr>
@@ -837,6 +847,26 @@ function init() {
 function show(id) { document.getElementById(id).classList.remove('hidden'); }
 function hide(id) { document.getElementById(id).classList.add('hidden'); }
 
+// ─── RESET APP ──────────────────────────────
+function resetApp() {
+  Swal.fire({
+    title: 'Reset Total Aplikasi?',
+    html: '<p style="color:#dc2626; font-size:0.9rem;">PERINGATAN: Seluruh data santri, pengaturan kelas, dan riwayat setoran akan dihapus permanen dari perangkat ini!</p>',
+    icon: 'error',
+    showCancelButton: true,
+    confirmButtonColor: '#dc2626',
+    cancelButtonColor: '#8c7d6e',
+    confirmButtonText: 'Ya, Reset Permanen',
+    cancelButtonText: 'Batal'
+  }).then((r) => {
+    if(r.isConfirmed) {
+      localStorage.removeItem(SK);
+      localStorage.removeItem(DK);
+      location.reload();
+    }
+  });
+}
+
 // ─── SETUP FORM ─────────────────────────────
 document.getElementById('form-setup').addEventListener('submit', function(e) {
   e.preventDefault();
@@ -874,7 +904,6 @@ function setupAC(inputId, listId, errId) {
         const div = document.createElement('div');
         div.className = 'autocomplete-item';
         div.innerHTML = s.n.replace(new RegExp(v,'gi'), m=>`<strong>${m}</strong>`);
-        // Gunakan onmousedown agar input tidak kehilangan fokus terlebih dahulu
         div.onmousedown = (e) => {
           e.preventDefault();
           inp.value = s.n;
@@ -1160,7 +1189,7 @@ function renderCards() {
           <span style="color:var(--teal);font-weight:700">${count}</span> setoran &nbsp;·&nbsp; Terakhir: ${escapeHtml(last)}
         </p>
       </div>
-      <button onclick="event.stopPropagation();exportPDFDirect('${safeNamaJS}')"
+      <button onclick="event.stopPropagation(); promptDateRange((s,e) => exportPDFDirect('${safeNamaJS}', s, e))"
         style="flex-shrink:0;width:36px;height:36px;border-radius:10px;background:#fee2e2;border:none;cursor:pointer;color:#dc2626;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:background 0.2s"
         onmouseover="this.style.background='#fca5a5'" onmouseout="this.style.background='#fee2e2'"
         title="Cetak PDF">
@@ -1272,6 +1301,67 @@ function doDelete(id, nama) {
   });
 }
 
+// ─── DATE RANGE PROMPT ──────────────────────
+function promptDateRange(callback) {
+  Swal.fire({
+    title: '<span style="font-family:Playfair Display,serif;font-size:1.25rem">Pilih Rentang Waktu</span>',
+    html: `
+      <select id="swal-range" class="field mb-3" style="width:100%" onchange="document.getElementById('swal-custom').style.display = this.value === 'custom' ? 'flex' : 'none'">
+        <option value="all">Semua Waktu</option>
+        <option value="7">7 Hari Terakhir</option>
+        <option value="30">30 Hari Terakhir</option>
+        <option value="custom">Kustom (Pilih Tanggal)</option>
+      </select>
+      <div id="swal-custom" style="display:none; gap:10px; align-items:center;">
+        <input type="date" id="swal-start" class="field" style="width:50%">
+        <span style="color:var(--ink-soft)">-</span>
+        <input type="date" id="swal-end" class="field" style="width:50%">
+      </div>
+    `,
+    showCancelButton: true,
+    confirmButtonText: 'Lanjutkan Cetak',
+    confirmButtonColor: '#1a5c5c',
+    cancelButtonText: 'Batal',
+    preConfirm: () => {
+      const range = document.getElementById('swal-range').value;
+      let start = null, end = null;
+      const today = new Date();
+      today.setHours(23,59,59,999);
+
+      if (range === '7') {
+        end = new Date(today);
+        start = new Date(today);
+        start.setDate(start.getDate() - 7);
+        start.setHours(0,0,0,0);
+      } else if (range === '30') {
+        end = new Date(today);
+        start = new Date(today);
+        start.setDate(start.getDate() - 30);
+        start.setHours(0,0,0,0);
+      } else if (range === 'custom') {
+        const sVal = document.getElementById('swal-start').value;
+        const eVal = document.getElementById('swal-end').value;
+        if (!sVal || !eVal) {
+          Swal.showValidationMessage('Silakan pilih tanggal mulai dan akhir yang lengkap');
+          return false;
+        }
+        start = new Date(sVal); start.setHours(0,0,0,0);
+        end = new Date(eVal); end.setHours(23,59,59,999);
+      }
+      return { start, end };
+    }
+  }).then((res) => {
+    if (res.isConfirmed) {
+      callback(res.value.start, res.value.end);
+    }
+  });
+}
+
+function getPeriodeText(start, end) {
+  if (!start || !end) return "Semua Waktu";
+  return `${fmtDate(start)} — ${fmtDate(end)}`;
+}
+
 // ─── EXPORT PDF ─────────────────────────────
 function makePDF(elId, filename) {
   Swal.fire({title:'Menyiapkan PDF…',allowOutsideClick:false,didOpen:()=>Swal.showLoading()});
@@ -1289,12 +1379,24 @@ function makePDF(elId, filename) {
   });
 }
 
-function exportGlobalPDF() {
-  const d = records();
-  if (!d.length) return Swal.fire('Kosong','Belum ada data setoran.','info');
+function exportGlobalPDF(startRange, endRange) {
+  let d = records();
+  
+  if (startRange && endRange) {
+    d = d.filter(r => {
+      const td = new Date(r.tarikh);
+      td.setHours(0,0,0,0);
+      return td.getTime() >= startRange.getTime() && td.getTime() <= endRange.getTime();
+    });
+  }
+
+  if (!d.length) return Swal.fire('Kosong','Tidak ada data setoran pada rentang waktu tersebut.','info');
+  
   const s = settings();
   document.getElementById('pg-halaqah').textContent = s.halaqah;
   document.getElementById('pg-musyrif').textContent  = s.musyrif;
+  document.getElementById('pg-periode').textContent  = getPeriodeText(startRange, endRange);
+  
   const tb = document.getElementById('pg-body');
   tb.innerHTML = '';
   d.sort((a,b)=>a.ts-b.ts).forEach(r=>{
@@ -1306,14 +1408,26 @@ function exportGlobalPDF() {
   makePDF('pdf-global',`Rekap_${s.halaqah.replace(/\s/g,'_')}.pdf`);
 }
 
-function exportPDFDirect(nama) {
-  const d = records().filter(r=>r.nama===nama).sort((a,b)=>a.ts-b.ts);
-  if (!d.length) return Swal.fire('Kosong','Santri ini belum punya setoran.','info');
+function exportPDFDirect(nama, startRange, endRange) {
+  let d = records().filter(r=>r.nama===nama).sort((a,b)=>a.ts-b.ts);
+  
+  if (startRange && endRange) {
+    d = d.filter(r => {
+      const td = new Date(r.tarikh);
+      td.setHours(0,0,0,0);
+      return td.getTime() >= startRange.getTime() && td.getTime() <= endRange.getTime();
+    });
+  }
+
+  if (!d.length) return Swal.fire('Kosong','Santri ini tidak memiliki setoran pada rentang waktu tersebut.','info');
+  
   const s = settings();
   document.getElementById('pp-nama').textContent    = nama;
   document.getElementById('pp-halaqah').textContent = s.halaqah;
   document.getElementById('pp-musyrif').textContent  = s.musyrif;
   document.getElementById('pp-ttd').textContent      = s.musyrif;
+  document.getElementById('pp-periode').textContent  = getPeriodeText(startRange, endRange);
+  
   const tb = document.getElementById('pp-body');
   tb.innerHTML = '';
   d.forEach(r=>{
@@ -1326,7 +1440,10 @@ function exportPDFDirect(nama) {
   makePDF('pdf-personal',`Rapor_${nama.replace(/\s/g,'_')}.pdf`);
 }
 
-function exportPDFFromModal() { exportPDFDirect(modalStudent); }
+function exportPDFFromModal() { 
+  closeModal(); // Tutup modal dulu agar UI tidak bertumpuk
+  promptDateRange((s,e) => exportPDFDirect(modalStudent, s, e)); 
+}
 
 // ─── MAIN EXPORT ────────────────────────────
 function mainExport() {
@@ -1341,7 +1458,7 @@ function mainExport() {
     cancelButtonText:'Batal'
   }).then(r=>{
     if(r.isConfirmed) triggerBackupOptions();
-    else if(r.isDenied) exportGlobalPDF();
+    else if(r.isDenied) promptDateRange((s,e) => exportGlobalPDF(s, e));
   });
 }
 
