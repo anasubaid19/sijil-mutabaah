@@ -14,7 +14,28 @@
 const manifestJSON={name:"Sijil Mutaba'ah",short_name:"Mutaba'ah",start_url:window.location.pathname,display:"standalone",background_color:"#faf6ee",theme_color:"#1a5c5c",icons:[{src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%231a5c5c'/%3E%3Ctext x='50%25' y='50%25' font-size='250' font-weight='bold' text-anchor='middle' alignment-baseline='central' fill='%23b8922a' font-family='serif'%3E%D8%B3%3C/text%3E%3C/svg%3E",sizes:"512x512",type:"image/svg+xml",purpose:"any maskable"}]};
 const manifestBlob=new Blob([JSON.stringify(manifestJSON)],{type:'application/manifest+json'});
 const manifestLink=document.createElement('link');manifestLink.rel='manifest';manifestLink.href=URL.createObjectURL(manifestBlob);document.head.appendChild(manifestLink);
-if('serviceWorker' in navigator){const sw=new Blob([`self.addEventListener('fetch',function(e){});`],{type:'application/javascript'});navigator.serviceWorker.register(URL.createObjectURL(sw)).catch(()=>{});}
+if('serviceWorker' in navigator){
+  const swCode = `
+  const CACHE_NAME = 'sijil-mutabaah-v5';
+  const urlsToCache = ['/','https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Nunito:wght@300;400;500;600;700&family=Amiri:wght@400;700&display=swap','https://cdn.tailwindcss.com','https://unpkg.com/@phosphor-icons/web','https://cdn.jsdelivr.net/npm/sweetalert2@11','https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js','https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js'];
+  self.addEventListener('install', e => e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(urlsToCache))));
+  self.addEventListener('fetch', e => {
+    e.respondWith(
+      caches.match(e.request).then(res => {
+        if(res) return res;
+        return fetch(e.request).then(fRes => {
+          return caches.open(CACHE_NAME).then(c => {
+            if(e.request.method === 'GET' && e.request.url.startsWith('http')) c.put(e.request, fRes.clone());
+            return fRes;
+          });
+        });
+      }).catch(() => {})
+    );
+  });
+  `;
+  const sw=new Blob([swCode],{type:'application/javascript'});
+  navigator.serviceWorker.register(URL.createObjectURL(sw)).catch(()=>{});
+}
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Nunito:wght@300;400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
@@ -103,10 +124,16 @@ label.field-label{display:block;font-size:.75rem;font-weight:700;letter-spacing:
 .progress-fill.low{background:linear-gradient(90deg,var(--danger),#ef4444)}
 .progress-fill.gold{background:linear-gradient(90deg,var(--gold),var(--gold-light))}
 /* Presensi */
-.presensi-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:12px;border:1.5px solid var(--border);cursor:pointer;transition:all .2s;background:var(--cream)}
+.presensi-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:12px;border:1.5px solid var(--border);transition:all .2s;background:var(--cream)}
 .presensi-item.hadir{border-color:var(--teal);background:var(--teal-light)}
-.presensi-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;color:transparent;font-size:12px;font-weight:900;transition:all .2s;flex-shrink:0;margin-left:auto}
-.presensi-item.hadir .presensi-check{border-color:var(--teal);background:var(--teal);color:#fff}
+.presensi-item.izin{border-color:#3b82f6;background:#eff6ff}
+.presensi-item.sakit{border-color:#f59e0b;background:#fffbeb}
+.presensi-item.alpha{border-color:var(--danger);background:#fef2f2}
+.presensi-select{padding:2px 6px;border-radius:6px;border:1px solid var(--border);font-size:.75rem;font-weight:700;background:var(--white);color:var(--ink);outline:none;cursor:pointer;margin-left:auto}
+.presensi-item.hadir .presensi-select{background:var(--teal);color:#fff;border-color:var(--teal)}
+.presensi-item.izin .presensi-select{background:#3b82f6;color:#fff;border-color:#3b82f6}
+.presensi-item.sakit .presensi-select{background:#f59e0b;color:#fff;border-color:#f59e0b}
+.presensi-item.alpha .presensi-select{background:var(--danger);color:#fff;border-color:var(--danger)}
 /* Laporan Cards */
 .laporan-card{background:var(--white);border:1.5px solid var(--border);border-radius:20px;padding:18px;cursor:pointer;transition:all .25s;box-shadow:0 2px 12px var(--shadow)}
 .laporan-card:hover{transform:translateY(-3px);box-shadow:0 8px 30px var(--shadow);border-color:var(--teal)}
@@ -157,6 +184,44 @@ label.field-label{display:block;font-size:.75rem;font-weight:700;letter-spacing:
   .laporan-grid{grid-template-columns:repeat(3,1fr)!important}
   .presensi-grid{grid-template-columns:repeat(3,1fr)!important}
 }
+/* Sidebar Toggle & Collapsed State */
+.app-sidebar { transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; }
+.app-main, .app-header { transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+.sidebar-btn span { white-space: nowrap; }
+.sidebar-toggle-btn { position: absolute; top: 20px; right: 16px; width: 32px; height: 32px; border-radius: 8px; background: var(--cream); border: 1px solid var(--border); color: var(--ink-mid); cursor: pointer; display: none; align-items: center; justify-content: center; transition: all 0.2s; z-index: 2; }
+.sidebar-toggle-btn:hover { color: var(--teal); border-color: var(--teal); }
+body.sidebar-collapsed .app-sidebar { width: 88px; }
+body.sidebar-collapsed .sidebar-texts { display: none; }
+body.sidebar-collapsed .sidebar-toggle-btn { position: static; margin: 0 auto; transform: rotate(180deg); }
+body.sidebar-collapsed .sidebar-header { padding: 20px 0 16px; display: flex; justify-content: center; }
+body.sidebar-collapsed .sidebar-btn span { display: none; }
+body.sidebar-collapsed .sidebar-btn { padding: 14px 0; justify-content: center; }
+body.sidebar-collapsed .sidebar-btn i { width: 100%; text-align: center; font-size: 1.5rem; }
+body.sidebar-collapsed .sidebar-footer span { display: none; }
+body.sidebar-collapsed .sidebar-footer { padding: 16px 0; display: flex; justify-content: center; }
+body.sidebar-collapsed .sidebar-footer .sidebar-btn { padding: 12px 0; }
+@media(min-width:1024px){
+  .sidebar-toggle-btn { display: flex; }
+  body.sidebar-collapsed .app-header { margin-left: 88px; }
+  body.sidebar-collapsed .app-main { margin-left: 88px; }
+}
+.btn-faded { background: transparent; color: var(--ink-soft); border: none; padding: .875rem 1.5rem; border-radius: 14px; font-family: 'Nunito', sans-serif; font-weight: 600; font-size: .875rem; cursor: pointer; transition: all .2s; display: flex; align-items: center; justify-content: center; }
+.btn-faded:hover { color: var(--ink); background: var(--cream); }
+
+/* Fix SweetAlert Theming & Readability */
+div:where(.swal2-container) div:where(.swal2-popup) {
+  background: var(--white) !important;
+  color: var(--ink) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 10px 40px var(--shadow) !important;
+}
+div:where(.swal2-container) h2:where(.swal2-title) {
+  color: var(--ink) !important;
+}
+div:where(.swal2-container) div:where(.swal2-html-container) {
+  color: var(--ink-mid) !important;
+}
 </style>
 </head>
 <body>
@@ -174,6 +239,13 @@ label.field-label{display:block;font-size:.75rem;font-weight:700;letter-spacing:
     <form id="form-setup" class="space-y-4" data-testid="setup-form">
       <div><label class="field-label">Nama Halaqah</label><input id="s-halaqah" type="text" class="field" placeholder="Cth: Halaqah Abu Bakar" required data-testid="input-halaqah"></div>
       <div><label class="field-label">Nama Guru / Pengampu</label><input id="s-guru" type="text" class="field" placeholder="Cth: Ustadz Ahmad" required data-testid="input-guru"></div>
+      <div><label class="field-label">Metode Kalkulasi Progress</label>
+        <select id="s-metode" class="field">
+          <option value="juz">Berbasis Juz (Target Cth: 30)</option>
+          <option value="lembar">Berbasis Lembar/Halaman (Target Cth: 604)</option>
+          <option value="ayat">Berbasis Persentase Ayat (Target Cth: 6236)</option>
+        </select>
+      </div>
       <div><label class="field-label">Gender Pengampu</label>
         <div class="flex gap-4 mt-1">
           <label class="flex items-center gap-2 cursor-pointer" data-testid="gender-laki"><input type="radio" name="gender" value="laki" checked class="accent-[#1a5c5c]" style="width:18px;height:18px"><span class="text-sm font-semibold" style="color:var(--ink-mid)">Laki-laki (Musyrif)</span></label>
@@ -199,19 +271,22 @@ label.field-label{display:block;font-size:.75rem;font-weight:700;letter-spacing:
 <div id="pg-app" class="hidden relative z-10" data-testid="main-app">
   <!-- SIDEBAR -->
   <aside class="app-sidebar" data-testid="sidebar">
-    <div class="sidebar-header">
-      <p class="font-arabic text-sm" style="color:var(--gold);text-align:left">&#1581;&#1601;&#1592; &#1575;&#1604;&#1602;&#1585;&#1570;&#1606;</p>
-      <h2 id="side-halaqah" class="font-display text-lg font-bold" style="color:var(--ink)">Halaqah</h2>
-      <p class="text-xs mt-1 flex items-center gap-1.5" style="color:var(--teal)"><i class="ph-fill ph-user-circle text-base"></i><span id="side-musyrif" class="font-semibold truncate">Musyrif</span></p>
+    <div class="sidebar-header relative">
+      <button class="sidebar-toggle-btn" onclick="toggleSidebar()" data-testid="sidebar-toggle" title="Sembunyikan Panel"><i class="ph-bold ph-caret-double-left"></i></button>
+      <div class="sidebar-texts">
+        <p class="font-arabic text-sm" style="color:var(--gold);text-align:left">&#1581;&#1601;&#1592; &#1575;&#1604;&#1602;&#1585;&#1570;&#1606;</p>
+        <h2 id="side-halaqah" class="font-display text-lg font-bold" style="color:var(--ink)">Halaqah</h2>
+        <p class="text-xs mt-1 flex items-center gap-1.5" style="color:var(--teal)"><i class="ph-fill ph-user-circle text-base"></i><span id="side-musyrif" class="font-semibold truncate">Musyrif</span></p>
+      </div>
     </div>
     <nav class="sidebar-nav">
-      <button class="sidebar-btn" data-nav="ziyadah" onclick="gotoTab('ziyadah')" data-testid="side-ziyadah"><i class="ph-bold ph-book-open-text"></i> Ziyadah</button>
-      <button class="sidebar-btn" data-nav="murajaah" onclick="gotoTab('murajaah')" data-testid="side-murajaah"><i class="ph-bold ph-arrows-clockwise"></i> Murajaah</button>
-      <button class="sidebar-btn active" data-nav="dashboard" onclick="gotoTab('dashboard')" data-testid="side-dashboard"><i class="ph-bold ph-squares-four"></i> Dashboard</button>
-      <button class="sidebar-btn" data-nav="laporan" onclick="gotoTab('laporan')" data-testid="side-laporan"><i class="ph-bold ph-chart-bar"></i> Laporan</button>
-      <button class="sidebar-btn" data-nav="pengaturan" onclick="gotoTab('pengaturan')" data-testid="side-pengaturan"><i class="ph-bold ph-gear"></i> Pengaturan</button>
+      <button class="sidebar-btn" data-nav="ziyadah" onclick="gotoTab('ziyadah')" data-testid="side-ziyadah" title="Ziyadah"><i class="ph-bold ph-book-open-text"></i> <span>Ziyadah</span></button>
+      <button class="sidebar-btn" data-nav="murajaah" onclick="gotoTab('murajaah')" data-testid="side-murajaah" title="Murajaah"><i class="ph-bold ph-arrows-clockwise"></i> <span>Murajaah</span></button>
+      <button class="sidebar-btn active" data-nav="dashboard" onclick="gotoTab('dashboard')" data-testid="side-dashboard" title="Dashboard"><i class="ph-bold ph-squares-four"></i> <span>Dashboard</span></button>
+      <button class="sidebar-btn" data-nav="laporan" onclick="gotoTab('laporan')" data-testid="side-laporan" title="Laporan"><i class="ph-bold ph-chart-bar"></i> <span>Laporan</span></button>
+      <button class="sidebar-btn" data-nav="pengaturan" onclick="gotoTab('pengaturan')" data-testid="side-pengaturan" title="Pengaturan"><i class="ph-bold ph-gear"></i> <span>Pengaturan</span></button>
     </nav>
-    <div class="sidebar-footer"><button class="sidebar-btn" onclick="toggleTheme()" data-testid="theme-toggle-sidebar"><i id="theme-icon-side" class="ph-bold ph-moon"></i> Ganti Tema</button></div>
+    <div class="sidebar-footer"><button class="sidebar-btn" onclick="toggleTheme()" data-testid="theme-toggle-sidebar" title="Ganti Tema"><i id="theme-icon-side" class="ph-bold ph-moon"></i> <span>Ganti Tema</span></button></div>
   </aside>
   <!-- HEADER -->
   <header class="app-header mobile-only px-5 pt-5 pb-3 flex items-start justify-between" data-testid="mobile-header">
@@ -343,7 +418,11 @@ label.field-label{display:block;font-size:.75rem;font-weight:700;letter-spacing:
       <div class="flex items-center gap-3 mb-2">
         <div style="width:36px;height:36px;background:var(--gold-pale);border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--gold)"><i class="ph-bold ph-chart-bar text-lg"></i></div>
         <div class="flex-1"><h2 class="font-display text-lg font-semibold" style="color:var(--ink)">Laporan</h2><div class="gold-line mt-0.5"></div></div>
-        <button onclick="mainExportPDF()" class="btn-gold btn-sm" style="width:auto" data-testid="export-rekap-btn"><i class="ph-bold ph-file-pdf"></i> Rekap PDF</button>
+        <div class="flex gap-2 flex-wrap justify-end">
+          <button onclick="exportPresensiCSV()" class="btn-ghost btn-sm" style="width:auto;color:#3b82f6;border-color:#3b82f6"><i class="ph-bold ph-clipboard-text"></i> CSV Presensi</button>
+          <button onclick="exportCSV()" class="btn-ghost btn-sm" style="width:auto;color:#16a34a;border-color:#16a34a"><i class="ph-bold ph-file-csv"></i> CSV Setoran</button>
+          <button onclick="mainExportPDF()" class="btn-gold btn-sm" style="width:auto" data-testid="export-rekap-btn"><i class="ph-bold ph-file-pdf"></i> Rekap PDF</button>
+        </div>
       </div>
       <div id="laporan-cards" class="laporan-grid grid grid-cols-2 gap-3" data-testid="laporan-cards"></div>
       <div id="laporan-insight" data-testid="laporan-insight"></div>
@@ -358,6 +437,7 @@ label.field-label{display:block;font-size:.75rem;font-weight:700;letter-spacing:
       </div>
       <div class="pengaturan-card"><h3 class="font-semibold mb-3" style="color:var(--ink)"><i class="ph-bold ph-download-simple" style="color:var(--teal)"></i> Export / Backup</h3><button onclick="doBackupJSON()" class="btn-primary" data-testid="backup-btn"><i class="ph-bold ph-export"></i> Download Backup JSON</button></div>
       <div class="pengaturan-card"><h3 class="font-semibold mb-3" style="color:var(--ink)"><i class="ph-bold ph-file-pdf" style="color:var(--danger)"></i> Rekap Kelas PDF</h3><p class="text-xs mb-3" style="color:var(--ink-soft)">Export rekapitulasi setoran seluruh santri.</p><button onclick="mainExportPDF()" class="btn-gold" data-testid="pengaturan-rekap-btn"><i class="ph-bold ph-file-pdf"></i> Export Rekap Kelas PDF</button></div>
+      <div class="pengaturan-card"><h3 class="font-semibold mb-3" style="color:var(--ink)"><i class="ph-bold ph-file-csv" style="color:#16a34a"></i> Export Data Excel (CSV)</h3><p class="text-xs mb-3" style="color:var(--ink-soft)">Download riwayat setoran dan presensi dalam format CSV.</p><div class="flex gap-2"><button onclick="exportCSV()" class="btn-ghost" style="color:#16a34a;border-color:#16a34a"><i class="ph-bold ph-download-simple"></i> Setoran</button><button onclick="exportPresensiCSV()" class="btn-ghost" style="color:#3b82f6;border-color:#3b82f6"><i class="ph-bold ph-download-simple"></i> Presensi</button></div></div>
       <div class="pengaturan-card"><h3 class="font-semibold mb-3" style="color:var(--ink)"><i class="ph-bold ph-upload-simple" style="color:var(--gold)"></i> Import Data</h3><input type="file" id="import-file-settings" accept=".json" class="hidden" onchange="doImport(event)"><button onclick="document.getElementById('import-file-settings').click()" class="btn-ghost" data-testid="import-btn"><i class="ph-bold ph-upload-simple"></i> Pilih File JSON</button></div>
       <div class="pengaturan-card"><h3 class="font-semibold mb-3" style="color:var(--ink)"><i class="ph-bold ph-pencil-simple" style="color:var(--teal-mid)"></i> Edit Pengaturan Kelas</h3><button onclick="goToSetupConfirm()" class="btn-ghost" data-testid="edit-settings-btn"><i class="ph-bold ph-pencil-simple"></i> Edit Pengaturan</button></div>
       <div class="pengaturan-card" style="border-color:rgba(220,38,38,.3)"><h3 class="font-semibold mb-3" style="color:var(--danger)"><i class="ph-bold ph-trash"></i> Hapus Semua Rekod</h3><button onclick="clearData()" class="btn-danger" data-testid="clear-data-btn"><i class="ph-bold ph-trash"></i> Hapus Semua Rekod Setoran</button></div>
@@ -474,7 +554,7 @@ const MONTHS=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus'
 
 // ─── STATE ──────────────────────────────────
 const SK='sijil_settings_v4',DK='sijil_records_v4',PK='sijil_presensi_';
-let currentTab='dashboard',zEditId=null,mEditId=null,zLintasOn=false,mLintasOn=false,modalStudent='',weeklyChart=null,modalChart=null;
+let currentTab='dashboard',zEditId=null,mEditId=null,zLintasOn=false,mLintasOn=false,modalStudent='',weeklyChart=null,modalChart=null,modalLimit=10;
 
 // ─── UTILITY ────────────────────────────────
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
@@ -492,21 +572,125 @@ function nameHash(n){let h=0;for(let i=0;i<n.length;i++)h=((h<<5)-h)+n.charCodeA
 function getInitials(n){const p=n.trim().split(/\s+/);return p.length>=2?(p[0][0]+p[p.length-1][0]).toUpperCase():n.substring(0,2).toUpperCase()}
 function getAvatarBg(n){return AVATAR_BG[nameHash(n)%AVATAR_BG.length]}
 function relativeTime(ts){const d=Date.now()-ts,m=Math.floor(d/60000);if(m<1)return'Baru saja';if(m<60)return m+' menit lalu';const h=Math.floor(m/60);if(h<24)return h+' jam lalu';const dy=Math.floor(h/24);if(dy===1)return'Kemarin';if(dy<7)return dy+' hari lalu';return fmtDate(new Date(ts).toISOString().split('T')[0])}
+function isHadir(val){return val==='hadir'||val===true;}
 
 // ─── MIGRATION ──────────────────────────────
 function migrate(s){
   if(s.siswa&&s.siswa.length&&typeof s.siswa[0]==='string')s.siswa=s.siswa.map(n=>({nama:n,hafalanAwal:0,targetHafalan:0}));
   if(s.musyrif&&!s.guru){s.guru=s.musyrif;delete s.musyrif}
   if(!s.gender)s.gender='laki';
+  if(!s.metodeProgress)s.metodeProgress='juz';
   return s;
 }
 function getSiswaNames(s){if(!s||!s.siswa)return[];return s.siswa.map(st=>typeof st==='string'?st:st.nama)}
 function getSiswaObj(s,nm){if(!s||!s.siswa)return null;const st=s.siswa.find(x=>(typeof x==='string'?x:x.nama)===nm);if(!st)return null;return typeof st==='string'?{nama:st,hafalanAwal:0,targetHafalan:0}:st}
 function getLabel(s){return(s&&s.gender==='perempuan')?'Musyrifah':'Musyrif'}
 
-// ─── THEME ──────────────────────────────────
-(function(){const t=localStorage.theme,sys=window.matchMedia('(prefers-color-scheme:dark)').matches;if(t==='dark'||(t===undefined&&sys)){document.documentElement.classList.add('dark');document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('[id^="theme-icon"]').forEach(i=>i.className='ph-bold ph-sun');const m=document.getElementById('meta-theme-color');if(m)m.setAttribute('content','#0b1414')})}})();
+// ─── ONBOARDING / WELCOME ───────────────────
+function showWelcomeAlert() {
+  try {
+    Swal.fire({
+      title: '<span class="font-display font-bold" style="color:var(--teal); font-size:1.75rem;">Ahlan wa Sahlan! ✨</span>',
+      html: `
+        <div style="text-align:center; padding:0 8px;">
+          <div style="width:72px; height:72px; background:var(--teal-light); color:var(--teal); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:2.5rem; margin:0 auto 16px;">
+            <i class="ph-duotone ph-book-open-text"></i>
+          </div>
+          <p style="font-size:0.95rem; color:var(--ink); margin-bottom:12px; font-weight:700;">Selamat datang di Sijil Mutaba'ah.</p>
+          <p style="font-size:0.85rem; color:var(--ink-soft); line-height:1.6;">Aplikasi pencatatan hafalan Al-Qur'an ini dirancang berjalan <b>100% offline, super cepat, dan rahasia</b>. Semua data hanya disimpan di dalam perangkat Anda tanpa server.</p>
+        </div>
+      `,
+      showCancelButton: true,
+      confirmButtonText: '<i class="ph-bold ph-book-open text-lg"></i> Baca Panduan (Penting)',
+      cancelButtonText: 'Nanti saja, Mulai Sekarang',
+      buttonsStyling: false,
+      customClass: {
+        confirmButton: 'btn-primary w-full',
+        cancelButton: 'btn-faded w-full',
+        actions: 'flex flex-col gap-3 w-full mt-8 px-4 sm:px-8 box-border'
+      },
+      allowOutsideClick: false,
+      allowEscapeKey: false
+    }).then((result) => {
+      if (result.isConfirmed) showGuideAlert();
+      else finishWelcome();
+    }).catch(() => finishWelcome());
+  } catch (e) { finishWelcome(); }
+}
+
+function showGuideAlert() {
+  try {
+    Swal.fire({
+      title: '<span class="font-display font-bold" style="color:var(--teal); font-size:1.5rem;">Panduan Penggunaan 📖</span>',
+      html: `
+        <div style="text-align:left; font-size:0.9rem; line-height:1.6; max-height:65vh; overflow-y:auto; padding-right:8px; color:var(--ink-mid);">
+          <p style="color:var(--ink-soft); margin-bottom:18px; font-size:0.85rem;">Agar aplikasi berjalan optimal dan data Anda aman, mohon perhatikan dua hal berikut:</p>
+
+          <!-- Instalasi -->
+          <h4 style="font-weight:800; color:var(--teal); display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+            <div style="background:var(--teal-light); width:28px; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center;"><i class="ph-bold ph-download-simple text-base"></i></div>
+            1. Instalasi (Akses Layar Utama)
+          </h4>
+          <div style="background:var(--cream); border:1px solid var(--border); border-radius:16px; padding:16px; margin-bottom:24px;">
+            <div style="margin-bottom:14px;">
+              <strong style="color:var(--ink); display:flex; align-items:center; gap:6px; font-size:0.95rem;"><i class="ph-fill ph-apple-logo text-xl"></i> iOS (iPhone/iPad)</strong>
+              <ul style="margin:6px 0 0 28px; padding:0; list-style:disc; color:var(--ink-soft); font-size:0.85rem;">
+                <li>Buka aplikasi di browser <b>Safari</b>.</li>
+                <li>Tekan tombol <b>Share</b> <i class="ph-bold ph-export align-middle"></i> di bilah bawah.</li>
+                <li>Geser ke bawah dan pilih <b>"Add to Home Screen"</b>.</li>
+              </ul>
+            </div>
+            <div style="border-top:1px dashed var(--border); padding-top:14px;">
+              <strong style="color:var(--ink); display:flex; align-items:center; gap:6px; font-size:0.95rem;"><i class="ph-fill ph-android-logo text-xl" style="color:#10b981"></i> Android</strong>
+              <ul style="margin:6px 0 0 28px; padding:0; list-style:disc; color:var(--ink-soft); font-size:0.85rem;">
+                <li>Buka aplikasi di browser <b>Chrome</b>.</li>
+                <li>Tekan ikon <b>Menu ⋮</b> di pojok kanan atas.</li>
+                <li>Pilih <b>"Add to Home screen"</b> atau <b>"Install app"</b>.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Penyimpanan -->
+          <h4 style="font-weight:800; color:var(--danger); display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+            <div style="background:rgba(220,38,38,0.1); color:var(--danger); width:28px; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center;"><i class="ph-bold ph-warning-circle text-base"></i></div>
+            2. Manajemen Data (Sangat Penting)
+          </h4>
+          <div style="background:rgba(220,38,38,0.05); border:1px solid rgba(220,38,38,0.2); border-radius:16px; padding:16px; margin-bottom:8px;">
+            <p style="margin-bottom:10px; font-size:0.85rem; color:var(--danger); font-weight:700;">Data mutaba'ah disimpan <u>hanya di perangkat ini</u>. Data akan HILANG PERMANEN jika Anda:</p>
+            <ul style="margin:0 0 14px 28px; padding:0; list-style:disc; font-size:0.85rem; color:var(--danger);">
+              <li>Membersihkan <i>Cache / Browsing Data</i> Browser.</li>
+              <li>Mereset HP atau menggunakan Mode Samaran (Incognito).</li>
+            </ul>
+            <div style="background:var(--white); padding:12px; border-radius:12px; border:1px solid var(--border); font-size:0.85rem; display:flex; gap:10px; align-items:flex-start;">
+              <i class="ph-fill ph-lightbulb text-xl flex-shrink-0" style="color:#f59e0b"></i>
+              <p style="margin:0; color:var(--ink-mid); line-height:1.5;"><b>Solusi Aman:</b> Lakukan <b>Backup Data JSON</b> secara rutin (misal tiap pekan) di menu <i class="ph-bold ph-gear"></i> <b>Pengaturan</b>. Simpan file tersebut di tempat aman untuk berjaga-jaga.</p>
+            </div>
+          </div>
+        </div>
+      `,
+      confirmButtonText: '<i class="ph-bold ph-check-circle text-lg"></i> Saya Mengerti & Mulai',
+      buttonsStyling: false,
+      customClass: {
+        confirmButton: 'btn-primary w-full',
+        popup: 'swal-custom-popup w-full max-w-2xl'
+      },
+      allowOutsideClick: false,
+      allowEscapeKey: false
+    }).then(() => {
+      finishWelcome();
+    }).catch(() => finishWelcome());
+  } catch (e) { finishWelcome(); }
+}
+
+function finishWelcome() {
+  localStorage.setItem('sijil_welcome_seen', 'true');
+  continueInit();
+}
+
+// ─── THEME & SIDEBAR ──────────────────────────────────
+(function(){const t=localStorage.theme,sys=window.matchMedia('(prefers-color-scheme:dark)').matches;if(t==='dark'||(t===undefined&&sys)){document.documentElement.classList.add('dark');document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('[id^="theme-icon"]').forEach(i=>i.className='ph-bold ph-sun');const m=document.getElementById('meta-theme-color');if(m)m.setAttribute('content','#0b1414')})}if(localStorage.sidebar_collapsed==='true')document.body.classList.add('sidebar-collapsed');})();
 function toggleTheme(){const d=document.documentElement.classList.toggle('dark');localStorage.theme=d?'dark':'light';document.querySelectorAll('[id^="theme-icon"]').forEach(i=>i.className=d?'ph-bold ph-sun':'ph-bold ph-moon');const m=document.getElementById('meta-theme-color');if(m)m.setAttribute('content',d?'#0b1414':'#faf6ee');if(currentTab==='dashboard')renderDashboard();if(currentTab==='laporan')renderLaporan()}
+function toggleSidebar(){const isC=document.body.classList.toggle('sidebar-collapsed');localStorage.sidebar_collapsed=isC;setTimeout(()=>window.dispatchEvent(new Event('resize')),300);}
 
 // ─── STUDENT ROWS (SETUP) ───────────────────
 function addStudentRow(nm='',h=0,t=0){const c=document.getElementById('student-rows');const i=c.children.length;const r=document.createElement('div');r.className='student-row';r.innerHTML=`<input type="text" class="field" style="flex:1;min-width:0" placeholder="Nama" value="${esc(nm)}" required data-testid="student-name-${i}"><input type="number" class="field" style="width:70px" placeholder="0" value="${h}" min="0" max="30" data-testid="student-hafalan-${i}"><input type="number" class="field" style="width:70px" placeholder="0" value="${t}" min="0" max="30" data-testid="student-target-${i}"><button type="button" class="row-del-btn" onclick="this.parentElement.remove()" data-testid="student-delete-${i}" ${i===0?'style="visibility:hidden"':''}><i class="ph-bold ph-x"></i></button>`;c.appendChild(r)}
@@ -514,6 +698,15 @@ function getStudentData(){const rows=document.querySelectorAll('#student-rows .s
 
 // ─── INIT ───────────────────────────────────
 function init(){
+  if(!localStorage.getItem('sijil_welcome_seen')){
+    setTimeout(() => { if (!localStorage.getItem('sijil_welcome_seen')) finishWelcome(); }, 15000);
+    showWelcomeAlert();
+    return;
+  }
+  continueInit();
+}
+
+function continueInit(){
   const s=settings();
   if(!s||!s.halaqah){document.getElementById('form-setup').reset();document.getElementById('student-rows').innerHTML='';addStudentRow();show('pg-setup');hide('pg-app');return}
   hide('pg-setup');show('pg-app');
@@ -528,7 +721,7 @@ function init(){
   document.getElementById('m-tarikh').value=todayStr();
   gotoTab('dashboard');
 }
-document.getElementById('form-setup').addEventListener('submit',function(e){e.preventDefault();const h=document.getElementById('s-halaqah').value.trim(),g=document.getElementById('s-guru').value.trim(),gd=document.querySelector('input[name="gender"]:checked').value,ss=getStudentData();if(!ss.length)return Swal.fire('Perhatian','Minimal 1 siswa','warning');saveSets({halaqah:h,guru:g,gender:gd,siswa:ss});Swal.fire({icon:'success',title:'Siap!',timer:1200,showConfirmButton:false}).then(init)});
+document.getElementById('form-setup').addEventListener('submit',function(e){e.preventDefault();const h=document.getElementById('s-halaqah').value.trim(),g=document.getElementById('s-guru').value.trim(),gd=document.querySelector('input[name="gender"]:checked').value,mp=document.getElementById('s-metode').value,ss=getStudentData();if(!ss.length)return Swal.fire('Perhatian','Minimal 1 siswa','warning');saveSets({halaqah:h,guru:g,gender:gd,metodeProgress:mp,siswa:ss});Swal.fire({icon:'success',title:'Siap!',timer:1200,showConfirmButton:false}).then(continueInit)});
 
 // ─── DROPDOWN ───────────────────────────────
 function fillDropdown(id,list){const sel=document.getElementById(id);sel.innerHTML='<option value="" disabled selected>-- Pilih Santri --</option>';if(list)[...list].sort().forEach(n=>sel.insertAdjacentHTML('beforeend',`<option value="${esc(n)}">${esc(n)}</option>`))}
@@ -603,21 +796,48 @@ document.getElementById('m-form').addEventListener('submit',e=>handleSubmit('m',
 ['z-form','m-form'].forEach(id=>document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.tagName==='INPUT'){e.preventDefault();e.target.blur()}}));
 
 // ─── PRESENSI ───────────────────────────────
-function getPresensi(date){return JSON.parse(localStorage.getItem(PK+date)||'{}')}
+function getPresensi(date){
+  const p = JSON.parse(localStorage.getItem(PK+date)||'{}');
+  for (let k in p) {
+    if (p[k] === true) p[k] = 'hadir';
+    else if (!['hadir','izin','sakit','alpha'].includes(p[k])) delete p[k];
+  }
+  return p;
+}
 function savePresensi(date,data){localStorage.setItem(PK+date,JSON.stringify(data))}
-function togglePresensiItem(nama){const d=todayStr(),p=getPresensi(d);p[nama]=!p[nama];savePresensi(d,p);renderDashboard()}
-function markAllPresent(){const s=settings();if(!s)return;const d=todayStr(),p=getPresensi(d);getSiswaNames(s).forEach(n=>p[n]=true);savePresensi(d,p);renderDashboard()}
+function updatePresensiItem(nama,val){const d=todayStr(),p=getPresensi(d);if(val)p[nama]=val;else delete p[nama];savePresensi(d,p);renderDashboard()}
+function markAllPresent(){const s=settings();if(!s)return;const d=todayStr(),p=getPresensi(d);getSiswaNames(s).forEach(n=>p[n]='hadir');savePresensi(d,p);renderDashboard()}
 function resetPresensi(){const d=todayStr();savePresensi(d,{});renderDashboard()}
 
 // ─── PROGRESS CALC ──────────────────────────
-function calcProgress(nama,s){const st=getSiswaObj(s,nama);if(!st)return{current:0,target:0,pct:0};const recs=records().filter(r=>r.nama===nama&&r.jenis==='Ziyadah');const jSet=new Set();recs.forEach(r=>{const pts=String(r.juz).split('-').map(Number).filter(n=>!isNaN(n));if(pts.length===2){for(let j=pts[0];j<=pts[1];j++)jSet.add(j)}else if(pts.length===1)jSet.add(pts[0])});const cur=st.hafalanAwal+jSet.size,tgt=st.targetHafalan||0;return{current:cur,target:tgt,pct:tgt>0?Math.min(100,Math.round(cur/tgt*100)):0}}
+function calcProgress(nama,s){
+  const st=getSiswaObj(s,nama);
+  if(!st)return{current:0,target:0,pct:0,unit:'Juz',noTarget:true};
+  const recs=records().filter(r=>r.nama===nama&&r.jenis==='Ziyadah');
+  let cur=0,tgt=st.targetHafalan||0,pct=0,m=s.metodeProgress||'juz',unit='Juz';
+  
+  if(m==='juz'){
+    const jSet=new Set();recs.forEach(r=>{const pts=String(r.juz).split('-').map(Number).filter(n=>!isNaN(n));if(pts.length===2){for(let j=pts[0];j<=pts[1];j++)jSet.add(j)}else if(pts.length===1)jSet.add(pts[0])});
+    cur=st.hafalanAwal+jSet.size;
+  }else{
+    let tAyat=0;recs.forEach(r=>{const pts=r.ayat.match(/\d+/g);if(pts&&pts.length>=2)tAyat+=Math.abs(pts[pts.length-1]-pts[0])+1;else if(pts&&pts.length===1)tAyat+=1});
+    if(m==='lembar'){cur=st.hafalanAwal+Math.floor(tAyat/15);unit='Lembar'}
+    else{cur=st.hafalanAwal+tAyat;if(!tgt)tgt=6236;unit='Ayat'}
+  }
+  
+  if(!tgt || tgt===0){
+    return {current:cur,target:0,pct:0,unit,noTarget:true};
+  }
+  pct=Math.min(100,Math.round(cur/tgt*100));
+  return {current:cur,target:tgt,pct,unit,noTarget:false};
+}
 
 // ─── DASHBOARD ──────────────────────────────
 function renderDashboard(){
   const s=settings();if(!s)return;
   const allR=records(),today=todayStr(),names=getSiswaNames(s),pres=getPresensi(today);
   const todayR=allR.filter(r=>r.tarikh===today);
-  const hadirNames=names.filter(n=>pres[n]);
+  const hadirNames=names.filter(n=>isHadir(pres[n]));
   const setorNames=new Set(todayR.map(r=>r.nama));
   const sudahSetor=hadirNames.filter(n=>setorNames.has(n));
   const belumSetor=hadirNames.filter(n=>!setorNames.has(n));
@@ -631,8 +851,8 @@ function renderDashboard(){
   const pl=document.getElementById('presensi-list');
   pl.innerHTML='';
   names.sort().forEach((nm,i)=>{
-    const h=!!pres[nm];
-    pl.insertAdjacentHTML('beforeend',`<div class="presensi-item ${h?'hadir':''}" onclick="togglePresensiItem('${esc(nm).replace(/'/g,"\\'")}')" data-testid="presensi-${i}"><div class="avatar" style="width:28px;height:28px;border-radius:8px;font-size:.7rem">${esc(nm).charAt(0).toUpperCase()}</div><span class="text-sm font-semibold truncate" style="color:var(--ink);flex:1;min-width:0">${esc(nm)}</span><div class="presensi-check"><i class="ph-bold ph-check"></i></div></div>`);
+    const st=pres[nm]; const sVal=st||'';
+    pl.insertAdjacentHTML('beforeend',`<div class="presensi-item ${sVal}" data-testid="presensi-${i}"><div class="avatar" style="width:28px;height:28px;border-radius:8px;font-size:.7rem">${esc(nm).charAt(0).toUpperCase()}</div><span class="text-sm font-semibold truncate" style="color:var(--ink);flex:1;min-width:0">${esc(nm)}</span><select class="presensi-select" onchange="updatePresensiItem('${esc(nm).replace(/'/g,"\\'")}', this.value)"><option value="" ${!sVal?'selected':''}>-</option><option value="hadir" ${sVal==='hadir'?'selected':''}>Hadir</option><option value="izin" ${sVal==='izin'?'selected':''}>Izin</option><option value="sakit" ${sVal==='sakit'?'selected':''}>Sakit</option><option value="alpha" ${sVal==='alpha'?'selected':''}>Alpha</option></select></div>`);
   });
 
   // Weekly chart
@@ -641,7 +861,11 @@ function renderDashboard(){
   // Progress
   const progDiv=document.getElementById('dash-progress');
   if(!names.length){progDiv.innerHTML='<p class="text-sm" style="color:var(--ink-soft)">Belum ada siswa.</p>'}
-  else{let h='';names.sort().forEach(nm=>{const p=calcProgress(nm,s),cls=p.pct<30?'low':p.pct<70?'gold':'';h+=`<div class="flex items-center gap-3"><div class="avatar" style="width:30px;height:30px;border-radius:8px;font-size:.75rem">${esc(nm).charAt(0).toUpperCase()}</div><div class="flex-1 min-w-0"><div class="flex justify-between items-center mb-1"><span class="text-sm font-semibold truncate" style="color:var(--ink)">${esc(nm)}</span><span class="text-xs font-bold" style="color:var(--teal)">${p.current}/${p.target} (${p.pct}%)</span></div><div class="progress-wrap"><div class="progress-fill ${cls}" style="width:${p.pct}%"></div></div></div></div>`});progDiv.innerHTML=h}
+  else{let h='';names.sort().forEach(nm=>{const p=calcProgress(nm,s),cls=p.pct<30?'low':p.pct<70?'gold':'';
+    const progBar = p.noTarget ? '<span style="color:var(--ink-faint);font-size:0.75rem;font-weight:700">Target belum diset</span>' : `<div class="progress-wrap"><div class="progress-fill ${cls}" style="width:${p.pct}%"></div></div>`;
+    const valStr = p.noTarget ? '' : `/${p.target} ${p.unit} (${p.pct}%)`;
+    h+=`<div class="flex items-center gap-3"><div class="avatar" style="width:30px;height:30px;border-radius:8px;font-size:.75rem">${esc(nm).charAt(0).toUpperCase()}</div><div class="flex-1 min-w-0"><div class="flex justify-between items-center mb-1"><span class="text-sm font-semibold truncate" style="color:var(--ink)">${esc(nm)}</span><span class="text-xs font-bold" style="color:var(--teal)">${p.current}${valStr}</span></div>${progBar}</div></div>`});
+    progDiv.innerHTML=h}
 
   // Recent
   const recDiv=document.getElementById('dash-recent');
@@ -652,9 +876,14 @@ function renderDashboard(){
   // Attention: no setor >3 days or progress <30%
   const attDiv=document.getElementById('dash-attention');
   const threeDaysAgo=new Date();threeDaysAgo.setDate(threeDaysAgo.getDate()-3);const threeStr=threeDaysAgo.toISOString().split('T')[0];
-  const attention=names.filter(nm=>{const recs=allR.filter(r=>r.nama===nm);if(!recs.some(r=>r.tarikh>=threeStr))return true;const p=calcProgress(nm,s);return p.target>0&&p.pct<30});
+  const attention=names.filter(nm=>{const recs=allR.filter(r=>r.nama===nm);if(!recs.some(r=>r.tarikh>=threeStr))return true;const p=calcProgress(nm,s);return !p.noTarget&&p.pct<30});
   if(!attention.length){attDiv.innerHTML='<p class="text-sm" style="color:var(--ink-soft)">Semua siswa dalam performa baik!</p>'}
-  else{let h='';attention.forEach(nm=>{const p=calcProgress(nm,s),last=allR.filter(r=>r.nama===nm).sort((a,b)=>(b.ts||0)-(a.ts||0))[0],lastD=last?relativeTime(last.ts||Date.now()):'Belum pernah setor';h+=`<div class="flex items-center gap-3 p-3 rounded-xl" style="background:linear-gradient(135deg,#fef2f2,#fecaca);border:1px solid #fca5a5"><div class="avatar" style="width:30px;height:30px;border-radius:8px;font-size:.75rem;background:linear-gradient(135deg,var(--danger),#991b1b)">${esc(nm).charAt(0).toUpperCase()}</div><div class="flex-1 min-w-0"><p class="text-sm font-semibold truncate" style="color:var(--ink)">${esc(nm)}</p><p class="text-xs" style="color:var(--ink-soft)">Terakhir: ${lastD} · ${p.pct}%</p><div class="progress-wrap mt-1"><div class="progress-fill low" style="width:${p.pct}%"></div></div></div></div>`});attDiv.innerHTML=h}
+  else{let h='';attention.forEach(nm=>{
+    const p=calcProgress(nm,s),last=allR.filter(r=>r.nama===nm).sort((a,b)=>(b.ts||0)-(a.ts||0))[0],lastD=last?relativeTime(last.ts||Date.now()):'Belum pernah setor';
+    const progBar = p.noTarget ? '<span style="color:var(--ink-faint);font-size:0.75rem;font-weight:700;display:block;margin-top:4px">Target belum diset</span>' : `<div class="progress-wrap mt-1"><div class="progress-fill low" style="width:${p.pct}%"></div></div>`;
+    const pctText = p.noTarget ? '' : ` · ${p.pct}%`;
+    h+=`<div class="flex items-center gap-3 p-3 rounded-xl" style="background:linear-gradient(135deg,#fef2f2,#fecaca);border:1px solid #fca5a5"><div class="avatar" style="width:30px;height:30px;border-radius:8px;font-size:.75rem;background:linear-gradient(135deg,var(--danger),#991b1b)">${esc(nm).charAt(0).toUpperCase()}</div><div class="flex-1 min-w-0"><p class="text-sm font-semibold truncate" style="color:var(--ink)">${esc(nm)}</p><p class="text-xs" style="color:var(--ink-soft)">Terakhir: ${lastD}${pctText}</p>${progBar}</div></div>`});
+    attDiv.innerHTML=h}
 }
 
 // ─── WEEKLY CHART ───────────────────────────
@@ -685,10 +914,14 @@ function renderLaporan(){
     const lastRec=recs[0],lastDate=lastRec?fmtDate(lastRec.tarikh):'—',lastGrade=lastRec?lastRec.gred:'';
     const ab=getAvatarBg(nm),ini=getInitials(nm);
     const cls=p.pct<30?'low':p.pct<70?'gold':'';
+    
+    const progVal = p.noTarget ? '—' : p.pct+'%';
+    const progBar = p.noTarget ? '<div class="mt-2 text-center"><span style="color:var(--ink-faint);font-size:0.75rem;font-weight:700">Target belum diset</span></div>' : `<div class="progress-wrap mt-2"><div class="progress-fill ${cls}" style="width:${p.pct}%"></div></div>`;
+
     const div=document.createElement('div');div.className='laporan-card fade-up';div.style.animationDelay=(i*40)+'ms';div.style.animationFillMode='both';
     div.onclick=()=>openModal(nm);
     div.setAttribute('data-testid','laporan-card-'+i);
-    div.innerHTML=`<div class="flex justify-between items-start"><div class="avatar-lg" style="background:${ab[0]};color:${ab[1]}">${ini}</div>${lastGrade?`<span class="${badgeCls(lastGrade)}">${esc(lastGrade)}</span>`:''}</div><h4 class="font-bold mt-3 truncate" style="color:var(--ink);font-size:.95rem">${esc(nm)}</h4><p class="text-xs mt-0.5 flex items-center gap-1" style="color:var(--ink-soft)"><i class="ph-bold ph-clock text-xs"></i> Update: ${esc(lastDate)}</p><div class="flex gap-2 mt-3"><div class="stat-mini"><span class="stat-mini-label">Setoran</span><span class="stat-mini-value">${count}</span></div><div class="stat-mini"><span class="stat-mini-label">Progress</span><span class="stat-mini-value" style="color:var(--teal)">${p.pct}%</span></div></div><div class="progress-wrap mt-2"><div class="progress-fill ${cls}" style="width:${p.pct}%"></div></div>`;
+    div.innerHTML=`<div class="flex justify-between items-start"><div class="avatar-lg" style="background:${ab[0]};color:${ab[1]}">${ini}</div>${lastGrade?`<span class="${badgeCls(lastGrade)}">${esc(lastGrade)}</span>`:''}</div><h4 class="font-bold mt-3 truncate" style="color:var(--ink);font-size:.95rem">${esc(nm)}</h4><p class="text-xs mt-0.5 flex items-center gap-1" style="color:var(--ink-soft)"><i class="ph-bold ph-clock text-xs"></i> Update: ${esc(lastDate)}</p><div class="flex gap-2 mt-3"><div class="stat-mini"><span class="stat-mini-label">Setoran</span><span class="stat-mini-value">${count}</span></div><div class="stat-mini"><span class="stat-mini-label">Progress</span><span class="stat-mini-value" style="color:var(--teal)">${progVal}</span></div></div>${progBar}`;
     container.appendChild(div);
   });
 
@@ -699,9 +932,14 @@ function renderLaporan(){
   const juzSet=new Set();monthRecs.forEach(r=>{const pts=String(r.juz).split('-').map(Number).filter(n=>!isNaN(n));if(pts.length===2){for(let j=pts[0];j<=pts[1];j++)juzSet.add(j)}else if(pts.length===1)juzSet.add(pts[0])});
   const grades={};monthRecs.forEach(r=>{grades[r.gred]=(grades[r.gred]||0)+1});
   const topGrade=Object.entries(grades).sort((a,b)=>b[1]-a[1])[0]?.[0]||'—';
-  let totalPct=0;names.forEach(nm=>{totalPct+=calcProgress(nm,s).pct});
-  const avgPct=names.length?Math.round(totalPct/names.length):0;
-  const onTrack=names.filter(nm=>calcProgress(nm,s).pct>=50).length;
+  
+  let totalPct=0, validNames=0;
+  names.forEach(nm=>{
+    const p = calcProgress(nm,s);
+    if(!p.noTarget) { totalPct+=p.pct; validNames++; }
+  });
+  const avgPct=validNames?Math.round(totalPct/validNames):0;
+  const onTrack=names.filter(nm=>{const p=calcProgress(nm,s);return !p.noTarget&&p.pct>=50}).length;
   const statusLabel=avgPct>=80?'Target Terlampaui':avgPct>=50?'Dalam Jalur':'Perlu Perhatian';
   const statusColor=avgPct>=80?'#86efac':avgPct>=50?'#fde68a':'#fca5a5';
   const curMonth=MONTHS[now.getMonth()]+' '+now.getFullYear();
@@ -711,14 +949,16 @@ function renderLaporan(){
 
 // ─── MODAL ──────────────────────────────────
 function openModal(nm){
-  modalStudent=nm;const s=settings(),allR=records().filter(r=>r.nama===nm).sort((a,b)=>(b.ts||0)-(a.ts||0));
+  modalStudent=nm;modalLimit=10;const s=settings(),allR=records().filter(r=>r.nama===nm).sort((a,b)=>(b.ts||0)-(a.ts||0));
   const ab=getAvatarBg(nm);
   document.getElementById('modal-nama').textContent=nm;
   document.getElementById('modal-count').textContent=allR.length+' Setoran';
   const av=document.getElementById('modal-avatar');av.textContent=getInitials(nm);av.style.background=ab[0];av.style.color=ab[1];
 
   const p=calcProgress(nm,s);
-  document.getElementById('modal-progress-wrap').innerHTML=`<div class="mb-3"><div class="flex justify-between mb-1"><span class="text-sm font-semibold" style="color:var(--ink)">Progress Hafalan</span><span class="text-sm font-bold" style="color:var(--teal)">${p.current}/${p.target} juz (${p.pct}%)</span></div><div class="progress-wrap" style="height:12px"><div class="progress-fill ${p.pct<30?'low':p.pct<70?'gold':''}" style="width:${p.pct}%"></div></div></div>`;
+  const progBar = p.noTarget ? '<span style="color:var(--ink-faint);font-size:0.85rem;font-weight:700;display:block;margin-top:4px">Target belum diset</span>' : `<div class="progress-wrap" style="height:12px"><div class="progress-fill ${p.pct<30?'low':p.pct<70?'gold':''}" style="width:${p.pct}%"></div></div>`;
+  const valStr = p.noTarget ? '' : `/${p.target} ${p.unit} (${p.pct}%)`;
+  document.getElementById('modal-progress-wrap').innerHTML=`<div class="mb-3"><div class="flex justify-between mb-1"><span class="text-sm font-semibold" style="color:var(--ink)">Progress Hafalan</span><span class="text-sm font-bold" style="color:var(--teal)">${p.current}${valStr}</span></div>${progBar}</div>`;
 
   // Chart
   const canvas=document.getElementById('modal-chart');
@@ -732,11 +972,18 @@ function openModal(nm){
     modalChart=new Chart(canvas,{type:'bar',data:{labels,datasets:[{data,backgroundColor:dk?['#5cc7c7','#e2be61','#4cbdbd','#b3a99b','#8a7f72']:['#1a5c5c','#b8922a','#257070','#8c7d6e','#c4b8a8'],borderRadius:8,barThickness:32}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{stepSize:1,color:dk?'#b3a99b':'#8c7d6e'},grid:{color:dk?'#293d3d':'#e8dfd0'}},y:{ticks:{color:dk?'#b3a99b':'#8c7d6e'},grid:{display:false}}}}});
   }
 
-  const histDiv=document.getElementById('modal-history');histDiv.innerHTML='';
-  const shown=allR.slice(0,10);
-  if(!shown.length){histDiv.innerHTML='<div class="text-center py-8"><i class="ph-duotone ph-folder-dashed text-4xl" style="color:var(--ink-faint)"></i><p class="mt-2 text-sm" style="color:var(--ink-soft)">Belum ada riwayat.</p></div>'}
-  else shown.forEach(h=>{histDiv.insertAdjacentHTML('beforeend',`<div class="history-item"><div class="flex items-start justify-between gap-2"><div class="flex-1 min-w-0 pl-3"><p class="font-semibold text-sm" style="color:var(--ink)">${esc(h.surah)}</p><p class="text-xs mt-0.5" style="color:var(--ink-soft)">Ayat ${esc(h.ayat)} · Juz ${esc(h.juz)}</p></div><div class="flex items-center gap-2 flex-shrink-0"><span class="${badgeCls(h.gred)}">${esc(h.gred)}</span><button data-action="edit" data-id="${esc(h.id)}" style="color:var(--ink-soft);background:none;border:none;cursor:pointer;font-size:1rem;padding:2px"><i class="ph-bold ph-pencil-simple"></i></button><button data-action="delete" data-id="${esc(h.id)}" data-nama="${esc(nm)}" style="color:var(--ink-soft);background:none;border:none;cursor:pointer;font-size:1rem;padding:2px"><i class="ph-bold ph-trash"></i></button></div></div><div class="flex items-center justify-between mt-2 pl-3"><span class="text-xs font-bold" style="color:var(--teal)">${esc(h.jenis)}</span><span class="text-xs" style="color:var(--ink-faint)">${relativeTime(h.ts||Date.now())}</span></div>${h.catatan?`<p class="text-xs mt-2 pl-3 pt-2" style="color:var(--ink-soft);border-top:1px dashed var(--border)">${esc(h.catatan)}</p>`:''}</div>`)});
+  renderModalHistory();
   show('modal-overlay');
+}
+function renderModalHistory(){
+  const nm=modalStudent, allR=records().filter(r=>r.nama===nm).sort((a,b)=>(b.ts||0)-(a.ts||0));
+  const histDiv=document.getElementById('modal-history');histDiv.innerHTML='';
+  const shown=allR.slice(0,modalLimit);
+  if(!shown.length){histDiv.innerHTML='<div class="text-center py-8"><i class="ph-duotone ph-folder-dashed text-4xl" style="color:var(--ink-faint)"></i><p class="mt-2 text-sm" style="color:var(--ink-soft)">Belum ada riwayat.</p></div>'}
+  else{
+    shown.forEach(h=>{histDiv.insertAdjacentHTML('beforeend',`<div class="history-item"><div class="flex items-start justify-between gap-2"><div class="flex-1 min-w-0 pl-3"><p class="font-semibold text-sm" style="color:var(--ink)">${esc(h.surah)}</p><p class="text-xs mt-0.5" style="color:var(--ink-soft)">Ayat ${esc(h.ayat)} · Juz ${esc(h.juz)}</p></div><div class="flex items-center gap-2 flex-shrink-0"><span class="${badgeCls(h.gred)}">${esc(h.gred)}</span><button data-action="edit" data-id="${esc(h.id)}" style="color:var(--ink-soft);background:none;border:none;cursor:pointer;font-size:1rem;padding:2px"><i class="ph-bold ph-pencil-simple"></i></button><button data-action="delete" data-id="${esc(h.id)}" data-nama="${esc(nm)}" style="color:var(--ink-soft);background:none;border:none;cursor:pointer;font-size:1rem;padding:2px"><i class="ph-bold ph-trash"></i></button></div></div><div class="flex items-center justify-between mt-2 pl-3"><span class="text-xs font-bold" style="color:var(--teal)">${esc(h.jenis)}</span><span class="text-xs" style="color:var(--ink-faint)">${relativeTime(h.ts||Date.now())}</span></div>${h.catatan?`<p class="text-xs mt-2 pl-3 pt-2" style="color:var(--ink-soft);border-top:1px dashed var(--border)">${esc(h.catatan)}</p>`:''}</div>`)});
+    if(allR.length>modalLimit){histDiv.insertAdjacentHTML('beforeend',`<button onclick="modalLimit+=10;renderModalHistory()" class="btn-ghost btn-sm" style="width:100%;margin-top:12px"><i class="ph-bold ph-caret-down"></i> Muat Lebih Banyak</button>`)}
+  }
 }
 document.getElementById('modal-history').addEventListener('click',function(e){const btn=e.target.closest('button[data-action]');if(!btn)return;if(btn.dataset.action==='edit')doEdit(btn.dataset.id);else if(btn.dataset.action==='delete')doDelete(btn.dataset.id,btn.dataset.nama)});
 function closeModal(){hide('modal-overlay');modalStudent=''}
@@ -744,11 +991,25 @@ function closeModal(){hide('modal-overlay');modalStudent=''}
 // ─── EDIT ───────────────────────────────────
 function doEdit(id){
   const d=records().find(r=>r.id===id);if(!d)return;
-  const isZ=d.jenis==='Ziyadah';const p=isZ?'z':'m';
+  
+  let mappedJenis = d.jenis;
+  if (mappedJenis === 'Sabqi' || mappedJenis === "Muraja'ah") mappedJenis = 'Murajaah Fardi';
+  
+  const isZ=mappedJenis==='Ziyadah';const p=isZ?'z':'m';
   if(isZ){zEditId=id;gotoTab('ziyadah')}else{mEditId=id;gotoTab('murajaah')}
+  
   document.getElementById(p+'-tarikh').value=d.tarikh;
   document.getElementById(p+'-nama').value=d.nama;
-  if(!isZ&&document.getElementById('m-jenis'))document.getElementById('m-jenis').value=d.jenis;
+  
+  if(!isZ){
+    const mJenisSel = document.getElementById('m-jenis');
+    if (mJenisSel) {
+      let optExists = Array.from(mJenisSel.options).some(opt => opt.value === mappedJenis);
+      if (!optExists) mappedJenis = 'Murajaah Fardi';
+      mJenisSel.value = mappedJenis;
+    }
+  }
+  
   document.getElementById(p+'-juz').value=d.juz;
   document.getElementById(p+'-gred').value=d.gred;
   document.getElementById(p+'-catatan').value=d.catatan||'';
@@ -765,29 +1026,62 @@ function doDelete(id,nm){Swal.fire({title:'Hapus Setoran?',icon:'warning',showCa
 
 // ─── DATE PRESETS ───────────────────────────
 function promptDateRange(cb){
+  let start=null, end=null;
   Swal.fire({
     title:'<span style="font-family:Playfair Display,serif;font-size:1.1rem">Pilih Rentang Waktu</span>',
-    html:`<div style="display:flex;flex-direction:column;gap:8px"><button type="button" class="swal2-styled" style="background:var(--teal);border-radius:10px;padding:10px;font-size:.9rem" onclick="document.getElementById('swal-range-val').value='today';Swal.clickConfirm()">Hari Ini</button><button type="button" class="swal2-styled" style="background:var(--teal);border-radius:10px;padding:10px;font-size:.9rem" onclick="document.getElementById('swal-range-val').value='week';Swal.clickConfirm()">1 Minggu (7 Hari)</button><button type="button" class="swal2-styled" style="background:var(--teal);border-radius:10px;padding:10px;font-size:.9rem" onclick="document.getElementById('swal-range-val').value='month';Swal.clickConfirm()">Bulan Ini</button><button type="button" class="swal2-styled" style="background:var(--teal);border-radius:10px;padding:10px;font-size:.9rem" onclick="document.getElementById('swal-range-val').value='semester';Swal.clickConfirm()">6 Bulan / 1 Semester</button><button type="button" class="swal2-styled" style="background:var(--gold);border-radius:10px;padding:10px;font-size:.9rem" onclick="document.getElementById('swal-range-val').value='all';Swal.clickConfirm()">Semua Waktu</button><button type="button" class="swal2-styled" style="background:var(--ink-mid);border-radius:10px;padding:10px;font-size:.85rem" onclick="document.getElementById('swal-custom-wrap').style.display='flex';this.style.display='none'">Custom...</button><div id="swal-custom-wrap" style="display:none;gap:8px;align-items:center"><input type="date" id="swal-start" class="field" style="width:48%"><span>—</span><input type="date" id="swal-end" class="field" style="width:48%"></div><input type="hidden" id="swal-range-val" value=""></div>`,
-    showConfirmButton:false,showCancelButton:true,cancelButtonText:'Batal',
-    preConfirm:()=>{
-      const rv=document.getElementById('swal-range-val').value;
-      if(rv)return rv;
-      const sV=document.getElementById('swal-start').value,eV=document.getElementById('swal-end').value;
-      if(sV&&eV)return'custom:'+sV+':'+eV;
-      return null;
+    html:`<div style="display:flex;flex-direction:column;gap:8px">
+      <button type="button" id="btn-preset-today" class="swal2-styled" style="background:var(--teal);border-radius:10px;padding:10px;font-size:.9rem;margin:0">Hari Ini</button>
+      <button type="button" id="btn-preset-week" class="swal2-styled" style="background:var(--teal);border-radius:10px;padding:10px;font-size:.9rem;margin:0">1 Minggu (7 Hari)</button>
+      <button type="button" id="btn-preset-month" class="swal2-styled" style="background:var(--teal);border-radius:10px;padding:10px;font-size:.9rem;margin:0">Bulan Ini</button>
+      <button type="button" id="btn-preset-semester" class="swal2-styled" style="background:var(--teal);border-radius:10px;padding:10px;font-size:.9rem;margin:0">6 Bulan / 1 Semester</button>
+      <button type="button" id="btn-preset-all" class="swal2-styled" style="background:var(--gold);border-radius:10px;padding:10px;font-size:.9rem;margin:0">Semua Waktu</button>
+      <button type="button" id="btn-preset-custom" class="swal2-styled" style="background:var(--ink-mid);border-radius:10px;padding:10px;font-size:.85rem;margin:0">Custom...</button>
+      <div id="swal-custom-wrap" style="display:none;gap:8px;align-items:center;margin-top:4px">
+        <input type="date" id="swal-start" class="field" style="width:48%"><span>—</span><input type="date" id="swal-end" class="field" style="width:48%">
+      </div>
+      <button type="button" id="swal-custom-go" class="swal2-styled" style="background:var(--teal);border-radius:10px;padding:10px;font-size:.9rem;display:none;margin:0;margin-top:8px">Terapkan</button>
+    </div>`,
+    showConfirmButton:false,
+    showCancelButton:true,
+    cancelButtonText:'Batal',
+    didOpen:()=>{
+      const now=new Date();
+      document.getElementById('btn-preset-today').onclick=()=>{
+        start=new Date(now); start.setHours(0,0,0,0);
+        end=new Date(now); end.setHours(23,59,59,999);
+        Swal.close(); cb(start,end);
+      };
+      document.getElementById('btn-preset-week').onclick=()=>{
+        end=new Date(now); end.setHours(23,59,59,999);
+        start=new Date(now); start.setDate(start.getDate()-6); start.setHours(0,0,0,0);
+        Swal.close(); cb(start,end);
+      };
+      document.getElementById('btn-preset-month').onclick=()=>{
+        start=new Date(now.getFullYear(),now.getMonth(),1,0,0,0,0);
+        end=new Date(now.getFullYear(),now.getMonth()+1,0,23,59,59,999);
+        Swal.close(); cb(start,end);
+      };
+      document.getElementById('btn-preset-semester').onclick=()=>{
+        start=new Date(now.getFullYear(),now.getMonth()-5,1,0,0,0,0);
+        end=new Date(now.getFullYear(),now.getMonth()+1,0,23,59,59,999);
+        Swal.close(); cb(start,end);
+      };
+      document.getElementById('btn-preset-all').onclick=()=>{
+        Swal.close(); cb(null,null);
+      };
+      document.getElementById('btn-preset-custom').onclick=(e)=>{
+        e.target.style.display='none'; document.getElementById('swal-custom-wrap').style.display='flex';
+      };
+      const sI=document.getElementById('swal-start'),eI=document.getElementById('swal-end'),gB=document.getElementById('swal-custom-go');
+      const chk=()=>{ if(sI.value&&eI.value) gB.style.display='block'; else gB.style.display='none'; };
+      sI.addEventListener('input',chk); eI.addEventListener('input',chk);
+      gB.onclick=()=>{
+        start=new Date(sI.value); start.setHours(0,0,0,0);
+        end=new Date(eI.value); end.setHours(23,59,59,999);
+        Swal.close(); cb(start,end);
+      };
     }
-  }).then(res=>{
-    if(!res.isConfirmed||!res.value)return;
-    let start=null,end=null;const now=new Date(),v=res.value;
-    if(v==='today'){start=new Date(now);start.setHours(0,0,0,0);end=new Date(now);end.setHours(23,59,59,999)}
-    else if(v==='week'){end=new Date(now);end.setHours(23,59,59,999);start=new Date(now);start.setDate(start.getDate()-6);start.setHours(0,0,0,0)}
-    else if(v==='month'){start=new Date(now.getFullYear(),now.getMonth(),1);end=new Date(now.getFullYear(),now.getMonth()+1,0,23,59,59,999)}
-    else if(v==='semester'){start=new Date(now.getFullYear(),now.getMonth()-5,1);end=new Date(now.getFullYear(),now.getMonth()+1,0,23,59,59,999)}
-    else if(v.startsWith('custom:')){const p=v.split(':');start=new Date(p[1]);start.setHours(0,0,0,0);end=new Date(p[2]);end.setHours(23,59,59,999)}
-    cb(start,end);
   });
-  // Enable custom confirm
-  setTimeout(()=>{const cw=document.getElementById('swal-custom-wrap');if(cw){const wrap=cw.parentElement;wrap.insertAdjacentHTML('beforeend','<button type="button" id="swal-custom-go" class="swal2-styled" style="background:var(--teal);border-radius:10px;padding:10px;font-size:.9rem;display:none;margin-top:4px" onclick="Swal.clickConfirm()">Terapkan</button>');const goBtn=document.getElementById('swal-custom-go');document.getElementById('swal-start').addEventListener('input',()=>goBtn.style.display='block');document.getElementById('swal-end').addEventListener('input',()=>goBtn.style.display='block')}},100);
 }
 function getPeriodeText(s,e){if(!s||!e)return"Semua Waktu";return`${fmtDate(s.toISOString().split('T')[0])} — ${fmtDate(e.toISOString().split('T')[0])}`}
 
@@ -798,13 +1092,60 @@ function exportPDFDirect(nm,sR,eR){let d=records().filter(r=>r.nama===nm).sort((
 function exportPDFFromModal(){const nm=modalStudent;closeModal();promptDateRange((s,e)=>exportPDFDirect(nm,s,e))}
 function mainExportPDF(){promptDateRange((s,e)=>exportGlobalPDF(s,e))}
 
+// ─── CSV EXPORT ─────────────────────────────
+function exportCSV(){
+  promptDateRange((sR, eR) => {
+    let d=records().sort((a,b)=>(a.ts||0)-(b.ts||0));
+    if(sR && eR){
+      d = d.filter(r => { const td = new Date(r.tarikh+'T00:00:00'); return td>=sR && td<=eR; });
+    }
+    if(!d.length)return Swal.fire('Kosong','Tidak ada data pada rentang waktu ini.','info');
+    
+    const s=settings();
+    let csv="Tanggal,Nama,Jenis,Surah,Ayat,Juz,Nilai,Catatan\n";
+    d.forEach(r=>{
+      const c=(r.catatan||'').replace(/"/g,'""');
+      csv+=`${r.tarikh},"${r.nama}",${r.jenis},"${r.surah}","${r.ayat}",${r.juz},${r.gred},"${c}"\n`;
+    });
+    
+    let periodStr = "Semua_Waktu";
+    if(sR && eR) periodStr = `${sR.toISOString().split('T')[0]}_sd_${eR.toISOString().split('T')[0]}`;
+    
+    const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.setAttribute("href",url);
+    a.setAttribute("download",`Data_Setoran_${s.halaqah.replace(/\s/g,'_')}_${periodStr}.csv`);
+    document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+  });
+}
+function exportPresensiCSV(){
+  const s=settings();if(!s)return;
+  let csv="Tanggal,Nama,Status\n";
+  const keys=Object.keys(localStorage).filter(k=>k.startsWith(PK)).sort();
+  if(!keys.length)return Swal.fire('Kosong','Tidak ada data presensi.','info');
+  keys.forEach(k=>{
+    const date=k.replace(PK,''), data=JSON.parse(localStorage.getItem(k));
+    Object.entries(data).forEach(([nm,st])=>{
+      const sVal=st===true?'Hadir':(st?st.charAt(0).toUpperCase()+st.slice(1):'');
+      csv+=`${date},"${nm}",${sVal}\n`;
+    });
+  });
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.setAttribute("href",url);
+  a.setAttribute("download",`Data_Presensi_${s.halaqah.replace(/\s/g,'_')}.csv`);
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+}
+
 // ─── BACKUP / IMPORT ────────────────────────
 function doBackupJSON(){const s=settings(),d=records(),pres={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k.startsWith(PK))pres[k.replace(PK,'')]=JSON.parse(localStorage.getItem(k))}const fn='Backup_'+s.halaqah.replace(/\s+/g,'_')+'.json';const blob=new Blob([JSON.stringify({settings:s,records:d,presensi:pres},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=fn;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);Swal.mixin({toast:true,position:'top-end',showConfirmButton:false,timer:2000}).fire({icon:'success',title:'Backup berhasil!'})}
 function doImport(e){const file=e.target.files[0];if(!file)return;const rd=new FileReader();rd.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(d.settings){const m=migrate(d.settings);saveSets(m)}if(d.records)saveRecs(d.records);if(d.presensi)Object.entries(d.presensi).forEach(([dt,data])=>localStorage.setItem(PK+dt,JSON.stringify(data)));Swal.fire({icon:'success',title:'Berhasil!',timer:1500,showConfirmButton:false}).then(init)}catch{Swal.fire('Gagal','File JSON tidak valid.','error')}};rd.readAsText(file);e.target.value=''}
 
 // ─── SETTINGS ───────────────────────────────
 function goToSetupConfirm(){Swal.fire({title:'Edit Pengaturan?',html:'<p style="font-size:.9rem;color:var(--ink-soft)">Disarankan backup dulu.</p>',icon:'warning',showDenyButton:true,showCancelButton:true,confirmButtonText:'Lanjut',denyButtonText:'Backup Dulu',cancelButtonText:'Batal',confirmButtonColor:'#1a5c5c',denyButtonColor:'#b8922a'}).then(r=>{if(r.isConfirmed)goToSetup();else if(r.isDenied){doBackupJSON();setTimeout(goToSetup,500)}})}
-function goToSetup(){const s=settings();document.getElementById('s-halaqah').value=s.halaqah||'';document.getElementById('s-guru').value=s.guru||'';const gR=document.querySelector(`input[name="gender"][value="${s.gender||'laki'}"]`);if(gR)gR.checked=true;const rows=document.getElementById('student-rows');rows.innerHTML='';if(s.siswa&&s.siswa.length)s.siswa.forEach(st=>{const o=typeof st==='string'?{nama:st,hafalanAwal:0,targetHafalan:0}:st;addStudentRow(o.nama,o.hafalanAwal,o.targetHafalan)});else addStudentRow();show('pg-setup');hide('pg-app')}
+function goToSetup(){const s=settings();document.getElementById('s-halaqah').value=s.halaqah||'';document.getElementById('s-guru').value=s.guru||'';if(s.metodeProgress)document.getElementById('s-metode').value=s.metodeProgress;const gR=document.querySelector(`input[name="gender"][value="${s.gender||'laki'}"]`);if(gR)gR.checked=true;const rows=document.getElementById('student-rows');rows.innerHTML='';if(s.siswa&&s.siswa.length)s.siswa.forEach(st=>{const o=typeof st==='string'?{nama:st,hafalanAwal:0,targetHafalan:0}:st;addStudentRow(o.nama,o.hafalanAwal,o.targetHafalan)});else addStudentRow();show('pg-setup');hide('pg-app')}
 function clearData(){Swal.fire({title:'Hapus Semua Rekod?',text:'Pengaturan tetap aman.',icon:'warning',showCancelButton:true,confirmButtonColor:'#dc2626',confirmButtonText:'Ya, Hapus',cancelButtonText:'Batal'}).then(r=>{if(r.isConfirmed){localStorage.removeItem(DK);renderDashboard();renderLaporan();Swal.mixin({toast:true,position:'top-end',showConfirmButton:false,timer:1800}).fire({icon:'success',title:'Rekod dihapus!'})}})}
 
 // Boot
