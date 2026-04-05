@@ -208,6 +208,17 @@ body.sidebar-collapsed .sidebar-footer .sidebar-btn { padding: 12px 0; }
 .btn-faded { background: transparent; color: var(--ink-soft); border: none; padding: .875rem 1.5rem; border-radius: 14px; font-family: 'Nunito', sans-serif; font-weight: 600; font-size: .875rem; cursor: pointer; transition: all .2s; display: flex; align-items: center; justify-content: center; }
 .btn-faded:hover { color: var(--ink); background: var(--cream); }
 
+/* Input Date Specific Fixes */
+input[type="date"].field {
+  min-width: 0;
+  cursor: pointer;
+}
+input[type="date"].field::-webkit-calendar-picker-indicator {
+  opacity: 0.6;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
 /* Fix SweetAlert Theming & Readability */
 div:where(.swal2-container) div:where(.swal2-popup) {
   background: var(--white) !important;
@@ -351,7 +362,7 @@ div:where(.swal2-container) div:where(.swal2-html-container) {
           <div><h2 class="font-display text-lg font-semibold" style="color:var(--ink)">Ziyadah &mdash; Hafalan Baru</h2><div class="gold-line mt-0.5"></div></div>
         </div>
         <form id="z-form" autocomplete="off" class="space-y-4" data-testid="z-form">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="grid grid-cols-2 gap-3">
             <div><label class="field-label">Santri</label><select id="z-nama" required class="field" data-testid="z-nama"><option value="" disabled selected>-- Pilih Santri --</option></select></div>
             <div><label class="field-label">Tanggal</label><input id="z-tarikh" type="date" required class="field" data-testid="z-tarikh"></div>
           </div>
@@ -386,7 +397,7 @@ div:where(.swal2-container) div:where(.swal2-html-container) {
           <div><h2 class="font-display text-lg font-semibold" style="color:var(--ink)">Murajaah &mdash; Ulangan</h2><div class="gold-line mt-0.5"></div></div>
         </div>
         <form id="m-form" autocomplete="off" class="space-y-4" data-testid="m-form">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="grid grid-cols-2 gap-3">
             <div><label class="field-label">Santri</label><select id="m-nama" required class="field" data-testid="m-nama"><option value="" disabled selected>-- Pilih Santri --</option></select></div>
             <div><label class="field-label">Tanggal</label><input id="m-tarikh" type="date" required class="field" data-testid="m-tarikh"></div>
           </div>
