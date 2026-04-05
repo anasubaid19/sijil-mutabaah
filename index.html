@@ -170,6 +170,11 @@ label.field-label{display:block;font-size:.75rem;font-weight:700;letter-spacing:
 .row-del-btn{width:32px;height:32px;border-radius:8px;background:none;border:1.5px solid var(--border);color:var(--ink-faint);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;transition:all .2s;flex-shrink:0;margin-top:2px}
 .row-del-btn:hover{border-color:var(--danger);color:var(--danger);background:#fee2e2}
 .chart-wrap{position:relative;width:100%;max-width:500px;margin:0 auto}
+/* Date input wrapper */
+.date-wrap{position:relative;width:100%}
+.date-wrap input[type="date"].field{padding-right:2.2rem;cursor:pointer}
+.date-wrap .date-icon{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--ink-faint);font-size:1rem;pointer-events:none}
+input[type="date"].field::-webkit-calendar-picker-indicator{position:absolute;right:0;top:0;width:100%;height:100%;opacity:0;cursor:pointer}
 @media(min-width:1024px){
   .app-sidebar{display:flex}
   .bottom-nav{display:none!important}
@@ -364,7 +369,7 @@ div:where(.swal2-container) div:where(.swal2-html-container) {
         <form id="z-form" autocomplete="off" class="space-y-4" data-testid="z-form">
           <div class="grid grid-cols-2 gap-3">
             <div><label class="field-label">Santri</label><select id="z-nama" required class="field" data-testid="z-nama"><option value="" disabled selected>-- Pilih Santri --</option></select></div>
-            <div><label class="field-label">Tanggal</label><input id="z-tarikh" type="date" required class="field" data-testid="z-tarikh"></div>
+            <div><label class="field-label">Tanggal</label><div class="date-wrap"><input id="z-tarikh" type="date" required class="field" data-testid="z-tarikh"><i class="ph-bold ph-calendar date-icon"></i></div></div>
           </div>
           <div class="grid grid-cols-3 gap-3">
             <div class="col-span-2 relative"><label class="field-label">Surah</label><input id="z-surah-a" type="text" class="field" placeholder="Nama surah..." required data-testid="z-surah-a"><div id="z-err-a" class="field-error">Nama surah tidak dikenali</div><div id="z-ac-a" class="autocomplete-list"></div></div>
@@ -399,7 +404,7 @@ div:where(.swal2-container) div:where(.swal2-html-container) {
         <form id="m-form" autocomplete="off" class="space-y-4" data-testid="m-form">
           <div class="grid grid-cols-2 gap-3">
             <div><label class="field-label">Santri</label><select id="m-nama" required class="field" data-testid="m-nama"><option value="" disabled selected>-- Pilih Santri --</option></select></div>
-            <div><label class="field-label">Tanggal</label><input id="m-tarikh" type="date" required class="field" data-testid="m-tarikh"></div>
+            <div><label class="field-label">Tanggal</label><div class="date-wrap"><input id="m-tarikh" type="date" required class="field" data-testid="m-tarikh"><i class="ph-bold ph-calendar date-icon"></i></div></div>
           </div>
           <div><label class="field-label">Jenis Murajaah</label><select id="m-jenis" required class="field" data-testid="m-jenis"><option value="Murajaah Fardi">Murajaah Fardi &mdash; Ulangan Individu</option><option value="Murajaah Bersama">Murajaah Bersama &mdash; Ulangan Bersama</option></select></div>
           <div class="grid grid-cols-3 gap-3">
