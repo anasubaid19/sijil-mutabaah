@@ -214,17 +214,6 @@ body.sidebar-collapsed .sidebar-footer .sidebar-btn { padding: 12px 0; }
 .btn-faded { background: transparent; color: var(--ink-soft); border: none; padding: .875rem 1.5rem; border-radius: 14px; font-family: 'Nunito', sans-serif; font-weight: 600; font-size: .875rem; cursor: pointer; transition: all .2s; display: flex; align-items: center; justify-content: center; }
 .btn-faded:hover { color: var(--ink); background: var(--cream); }
 
-/* Input Date Specific Fixes */
-input[type="date"].field {
-  min-width: 0;
-  cursor: pointer;
-}
-input[type="date"].field::-webkit-calendar-picker-indicator {
-  opacity: 0.6;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
 /* Fix SweetAlert Theming & Readability */
 div:where(.swal2-container) div:where(.swal2-popup) {
   background: var(--white) !important;
@@ -1046,17 +1035,17 @@ function promptDateRange(cb){
   let start=null, end=null;
   Swal.fire({
     title:'<span style="font-family:Playfair Display,serif;font-size:1.1rem">Pilih Rentang Waktu</span>',
-    html:`<div style="display:flex;flex-direction:column;gap:8px">
-      <button type="button" id="btn-preset-today" class="swal2-styled" style="background:var(--teal);border-radius:10px;padding:10px;font-size:.9rem;margin:0">Hari Ini</button>
-      <button type="button" id="btn-preset-week" class="swal2-styled" style="background:var(--teal);border-radius:10px;padding:10px;font-size:.9rem;margin:0">1 Minggu (7 Hari)</button>
-      <button type="button" id="btn-preset-month" class="swal2-styled" style="background:var(--teal);border-radius:10px;padding:10px;font-size:.9rem;margin:0">Bulan Ini</button>
-      <button type="button" id="btn-preset-semester" class="swal2-styled" style="background:var(--teal);border-radius:10px;padding:10px;font-size:.9rem;margin:0">6 Bulan / 1 Semester</button>
-      <button type="button" id="btn-preset-all" class="swal2-styled" style="background:var(--gold);border-radius:10px;padding:10px;font-size:.9rem;margin:0">Semua Waktu</button>
-      <button type="button" id="btn-preset-custom" class="swal2-styled" style="background:var(--ink-mid);border-radius:10px;padding:10px;font-size:.85rem;margin:0">Custom...</button>
+    html:`<div style="display:flex;flex-direction:column;gap:10px;width:100%;padding:0 4px">
+      <button type="button" id="btn-preset-today" style="background:#1a5c5c;color:#ffffff;font-weight:700;border-radius:12px;padding:12px;font-size:.95rem;width:100%;border:none;cursor:pointer;font-family:'Nunito',sans-serif">Hari Ini</button>
+      <button type="button" id="btn-preset-week" style="background:#1a5c5c;color:#ffffff;font-weight:700;border-radius:12px;padding:12px;font-size:.95rem;width:100%;border:none;cursor:pointer;font-family:'Nunito',sans-serif">1 Minggu (7 Hari)</button>
+      <button type="button" id="btn-preset-month" style="background:#1a5c5c;color:#ffffff;font-weight:700;border-radius:12px;padding:12px;font-size:.95rem;width:100%;border:none;cursor:pointer;font-family:'Nunito',sans-serif">Bulan Ini</button>
+      <button type="button" id="btn-preset-semester" style="background:#1a5c5c;color:#ffffff;font-weight:700;border-radius:12px;padding:12px;font-size:.95rem;width:100%;border:none;cursor:pointer;font-family:'Nunito',sans-serif">6 Bulan / 1 Semester</button>
+      <button type="button" id="btn-preset-all" style="background:#b8922a;color:#ffffff;font-weight:700;border-radius:12px;padding:12px;font-size:.95rem;width:100%;border:none;cursor:pointer;font-family:'Nunito',sans-serif">Semua Waktu</button>
+      <button type="button" id="btn-preset-custom" style="background:transparent;color:var(--ink-mid);font-weight:600;border-radius:12px;padding:12px;font-size:.9rem;width:100%;cursor:pointer;font-family:'Nunito',sans-serif;border:1.5px solid var(--border)">Custom...</button>
       <div id="swal-custom-wrap" style="display:none;gap:8px;align-items:center;margin-top:4px">
         <input type="date" id="swal-start" class="field" style="width:48%"><span>—</span><input type="date" id="swal-end" class="field" style="width:48%">
       </div>
-      <button type="button" id="swal-custom-go" class="swal2-styled" style="background:var(--teal);border-radius:10px;padding:10px;font-size:.9rem;display:none;margin:0;margin-top:8px">Terapkan</button>
+      <button type="button" id="swal-custom-go" style="background:#1a5c5c;color:#ffffff;font-weight:700;border-radius:12px;padding:12px;font-size:.9rem;width:100%;border:none;cursor:pointer;font-family:'Nunito',sans-serif;margin-top:4px;display:none;">Terapkan</button>
     </div>`,
     showConfirmButton:false,
     showCancelButton:true,
