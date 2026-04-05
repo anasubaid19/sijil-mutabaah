@@ -172,9 +172,10 @@ label.field-label{display:block;font-size:.75rem;font-weight:700;letter-spacing:
 .chart-wrap{position:relative;width:100%;max-width:500px;margin:0 auto}
 /* Date input wrapper */
 .date-wrap{position:relative;width:100%}
-.date-wrap input[type="date"].field{padding-right:2.2rem;cursor:pointer}
-.date-wrap .date-icon{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--ink-faint);font-size:1rem;pointer-events:none}
-input[type="date"].field::-webkit-calendar-picker-indicator{position:absolute;right:0;top:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.date-wrap input[type="date"].field{padding-right:2.4rem;cursor:pointer;-webkit-appearance:none;appearance:none}
+.date-wrap .date-icon{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--teal);font-size:1rem;pointer-events:none;z-index:1}
+input[type="date"].field::-webkit-calendar-picker-indicator{opacity:0;cursor:pointer;width:1.5rem;height:1.5rem;position:absolute;right:0;top:50%;transform:translateY(-50%)}
+input[type="date"].field::-webkit-inner-spin-button{display:none}
 @media(min-width:1024px){
   .app-sidebar{display:flex}
   .bottom-nav{display:none!important}
