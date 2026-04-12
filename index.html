@@ -165,9 +165,38 @@ label.field-label{display:block;font-size:.75rem;font-weight:700;letter-spacing:
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--ink-faint);border-radius:4px}
 .swal2-popup{font-family:'Nunito',sans-serif!important;border-radius:20px!important}
 .swal2-title{font-family:'Playfair Display',serif!important}
-.student-row{display:flex;gap:8px;align-items:flex-start;padding:8px;background:var(--cream);border:1px solid var(--border);border-radius:12px}
-.student-row .field{padding:.6rem .75rem;font-size:.85rem}
-.row-del-btn{width:32px;height:32px;border-radius:8px;background:none;border:1.5px solid var(--border);color:var(--ink-faint);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;transition:all .2s;flex-shrink:0;margin-top:2px}
+
+/* ── STUDENT ROW GRID (FIX) ── */
+.student-row-grid {
+  display: grid;
+  grid-template-columns: 3fr 1fr 1fr 1fr 36px;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 12px;
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.student-row-grid .field {
+  padding: .55rem .6rem;
+  font-size: .85rem;
+}
+.student-hdr {
+  display: grid;
+  grid-template-columns: 3fr 1fr 1fr 1fr 36px;
+  gap: 8px;
+  padding: 0 12px;
+  margin-bottom: 6px;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.student-hdr span { text-align: center; }
+.student-hdr span:first-child { text-align: left; }
+
+.row-del-btn{width:32px;height:32px;border-radius:8px;background:none;border:1.5px solid var(--border);color:var(--ink-faint);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all .2s;flex-shrink:0}
 .row-del-btn:hover{border-color:var(--danger);color:var(--danger);background:#fee2e2}
 .chart-wrap{position:relative;width:100%;max-width:500px;margin:0 auto}
 /* Date input wrapper */
@@ -176,21 +205,28 @@ label.field-label{display:block;font-size:.75rem;font-weight:700;letter-spacing:
 .date-wrap .date-icon{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--teal);font-size:1rem;pointer-events:none;z-index:1}
 input[type="date"].field::-webkit-calendar-picker-indicator{opacity:0;cursor:pointer;width:1.5rem;height:1.5rem;position:absolute;right:0;top:50%;transform:translateY(-50%)}
 input[type="date"].field::-webkit-inner-spin-button{display:none}
+
+/* === DESKTOP UI ENHANCEMENTS === */
 @media(min-width:1024px){
-  .app-sidebar{display:flex}
+  .app-sidebar{display:flex; width: 280px;}
   .bottom-nav{display:none!important}
-  .app-header{margin-left:250px}
-  .app-main{margin-left:250px;max-width:none;padding:0 32px 32px}
+  .app-header{margin-left:280px; padding: 2rem 2.5rem 1rem;}
+  .app-main{margin-left:280px; max-width:none; padding:0 2.5rem 2.5rem;}
+  .setup-split { flex-direction: row !important; max-width: 900px !important; padding: 0 !important; }
+  .setup-brand { display: flex !important; width: 45%; background: linear-gradient(135deg, var(--teal-dark), var(--teal)); color: white; flex-direction: column; justify-content: center; align-items: center; padding: 3rem; text-align: center; position: relative; }
+  .setup-form-area { width: 55%; padding: 3rem !important; }
+  .desktop-grid { display: grid; grid-template-columns: 1.8fr 1fr; gap: 1.5rem; align-items: start; }
   .stats-grid{grid-template-columns:repeat(4,1fr)!important}
   .laporan-grid{grid-template-columns:repeat(4,1fr)!important}
-  .presensi-grid{grid-template-columns:repeat(4,1fr)!important}
+  .presensi-grid{grid-template-columns:repeat(2,1fr)!important}
   .mobile-only{display:none!important}
+  .desktop-only{display:block!important}
+  .desktop-hidden{display:none!important}
 }
 @media(min-width:768px) and (max-width:1023px){
   .laporan-grid{grid-template-columns:repeat(3,1fr)!important}
   .presensi-grid{grid-template-columns:repeat(3,1fr)!important}
 }
-/* Sidebar Toggle & Collapsed State */
 .app-sidebar { transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; }
 .app-main, .app-header { transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 .sidebar-btn span { white-space: nowrap; }
@@ -213,8 +249,6 @@ body.sidebar-collapsed .sidebar-footer .sidebar-btn { padding: 12px 0; }
 }
 .btn-faded { background: transparent; color: var(--ink-soft); border: none; padding: .875rem 1.5rem; border-radius: 14px; font-family: 'Nunito', sans-serif; font-weight: 600; font-size: .875rem; cursor: pointer; transition: all .2s; display: flex; align-items: center; justify-content: center; }
 .btn-faded:hover { color: var(--ink); background: var(--cream); }
-
-/* Fix SweetAlert Theming & Readability */
 div:where(.swal2-container) div:where(.swal2-popup) {
   background: var(--white) !important;
   color: var(--ink) !important;
@@ -222,53 +256,80 @@ div:where(.swal2-container) div:where(.swal2-popup) {
   border-radius: 24px !important;
   box-shadow: 0 10px 40px var(--shadow) !important;
 }
-div:where(.swal2-container) h2:where(.swal2-title) {
-  color: var(--ink) !important;
-}
-div:where(.swal2-container) div:where(.swal2-html-container) {
-  color: var(--ink-mid) !important;
-}
+div:where(.swal2-container) h2:where(.swal2-title) { color: var(--ink) !important; }
+div:where(.swal2-container) div:where(.swal2-html-container) { color: var(--ink-mid) !important; }
 </style>
 </head>
 <body>
 <!-- SETUP PAGE -->
-<section id="pg-setup" class="hidden min-h-screen flex items-center justify-center p-5 relative z-10" data-testid="setup-page">
-  <div class="absolute top-5 right-5"><button class="action-btn" onclick="toggleTheme()" data-testid="theme-toggle-setup"><i id="theme-icon-setup" class="ph-bold ph-moon"></i></button></div>
-  <div class="card w-full max-w-lg p-8 fade-up mt-6">
-    <div class="geo-corner tl"></div><div class="geo-corner br"></div>
-    <div class="text-center mb-8">
-      <p class="ornament mb-3">&#10022; &#10022; &#10022;</p>
-      <h1 class="font-display text-3xl font-bold" style="color:var(--teal)">Sijil Mutabaah</h1>
-      <p class="font-arabic text-xl mt-1" style="color:var(--gold)">&#1587;&#1580;&#1604; &#1605;&#1578;&#1575;&#1576;&#1593;&#1577; &#1581;&#1601;&#1592; &#1575;&#1604;&#1602;&#1585;&#1570;&#1606;</p>
-      <div class="gold-line mx-auto mt-3"></div>
+<section id="pg-setup" class="hidden min-h-screen flex items-center justify-center p-4 sm:p-8 relative z-10" data-testid="setup-page">
+  <div class="absolute top-5 right-5 z-20"><button class="action-btn" onclick="toggleTheme()" data-testid="theme-toggle-setup" style="box-shadow: 0 4px 12px rgba(0,0,0,0.1);"><i id="theme-icon-setup" class="ph-bold ph-moon"></i></button></div>
+  
+  <div class="card w-full max-w-lg setup-split p-8 fade-up flex flex-col">
+    <div class="hidden setup-brand overflow-hidden">
+      <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image:repeating-linear-gradient(45deg,var(--gold) 0,var(--gold) 1px,transparent 0,transparent 50%),repeating-linear-gradient(-45deg,var(--gold) 0,var(--gold) 1px,transparent 0,transparent 50%);background-size:30px 30px"></div>
+      <div style="width:100px; height:100px; border-radius:50%; background:var(--gold-pale); color:var(--gold); display:flex; align-items:center; justify-content:center; font-size:3rem; margin-bottom:1.5rem; border:4px solid var(--gold); box-shadow: 0 0 20px rgba(0,0,0,0.2); position:relative; z-index:1;">
+        <i class="ph-duotone ph-book-open-text"></i>
+      </div>
+      <h1 class="font-display text-4xl font-bold mb-2 relative z-1">Sijil Mutabaah</h1>
+      <p class="font-arabic text-2xl mb-6 relative z-1" style="color:var(--gold-light)">سجل متابعة حفظ القرآن</p>
+      <p class="text-sm font-semibold opacity-90 leading-relaxed max-w-xs relative z-1">Sistem pencatatan mutaba'ah hafalan santri yang cepat, aman, dan 100% offline.</p>
     </div>
-    <form id="form-setup" class="space-y-4" data-testid="setup-form">
-      <div><label class="field-label">Nama Halaqah</label><input id="s-halaqah" type="text" class="field" placeholder="Cth: Halaqah Abu Bakar" required data-testid="input-halaqah"></div>
-      <div><label class="field-label">Nama Guru / Pengampu</label><input id="s-guru" type="text" class="field" placeholder="Cth: Ustadz Ahmad" required data-testid="input-guru"></div>
-      <div><label class="field-label">Metode Kalkulasi Progress</label>
-        <select id="s-metode" class="field">
-          <option value="juz">Berbasis Juz (Target Cth: 30)</option>
-          <option value="lembar">Berbasis Lembar/Halaman (Target Cth: 604)</option>
-          <option value="ayat">Berbasis Persentase Ayat (Target Cth: 6236)</option>
-        </select>
+
+    <div class="setup-form-area relative w-full">
+      <div class="geo-corner tl desktop-hidden"></div><div class="geo-corner br desktop-hidden"></div>
+      
+      <div class="text-center mb-8 desktop-hidden">
+        <p class="ornament mb-3">&#10022; &#10022; &#10022;</p>
+        <h1 class="font-display text-3xl font-bold" style="color:var(--teal)">Sijil Mutabaah</h1>
+        <p class="font-arabic text-xl mt-1" style="color:var(--gold)">&#1587;&#1580;&#1604; &#1605;&#1578;&#1575;&#1576;&#1593;&#1577; &#1581;&#1601;&#1592; &#1575;&#1604;&#1602;&#1585;&#1570;&#1606;</p>
+        <div class="gold-line mx-auto mt-3"></div>
       </div>
-      <div><label class="field-label">Gender Pengampu</label>
-        <div class="flex gap-4 mt-1">
-          <label class="flex items-center gap-2 cursor-pointer" data-testid="gender-laki"><input type="radio" name="gender" value="laki" checked class="accent-[#1a5c5c]" style="width:18px;height:18px"><span class="text-sm font-semibold" style="color:var(--ink-mid)">Laki-laki (Musyrif)</span></label>
-          <label class="flex items-center gap-2 cursor-pointer" data-testid="gender-perempuan"><input type="radio" name="gender" value="perempuan" class="accent-[#1a5c5c]" style="width:18px;height:18px"><span class="text-sm font-semibold" style="color:var(--ink-mid)">Perempuan (Musyrifah)</span></label>
+
+      <div class="hidden desktop-only mb-6">
+        <h2 class="font-display text-2xl font-bold" style="color:var(--ink)">Pengaturan Halaqah</h2>
+        <p class="text-sm mt-1 font-semibold" style="color:var(--ink-soft)">Silakan isi data awal kelas Anda.</p>
+        <div class="gold-line mt-3"></div>
+      </div>
+
+      <form id="form-setup" class="space-y-4" data-testid="setup-form">
+        <div><label class="field-label">Nama Halaqah</label><input id="s-halaqah" type="text" class="field" placeholder="Cth: Halaqah Abu Bakar" required data-testid="input-halaqah"></div>
+        <div><label class="field-label">Nama Guru / Pengampu</label><input id="s-guru" type="text" class="field" placeholder="Cth: Ustadz Ahmad" required data-testid="input-guru"></div>
+        <div><label class="field-label">Metode Kalkulasi Progress</label>
+          <select id="s-metode" class="field">
+            <option value="juz">Berbasis Juz (Target Cth: 30)</option>
+            <option value="surah">Berbasis Surah (Target Cth: 114 atau 37)</option>
+          </select>
         </div>
+        <div><label class="field-label">Gender Pengampu</label>
+          <div class="flex gap-4 mt-1">
+            <label class="flex items-center gap-2 cursor-pointer" data-testid="gender-laki"><input type="radio" name="gender" value="laki" checked class="accent-[#1a5c5c]" style="width:18px;height:18px"><span class="text-sm font-semibold" style="color:var(--ink-mid)">Laki-laki (Musyrif)</span></label>
+            <label class="flex items-center gap-2 cursor-pointer" data-testid="gender-perempuan"><input type="radio" name="gender" value="perempuan" class="accent-[#1a5c5c]" style="width:18px;height:18px"><span class="text-sm font-semibold" style="color:var(--ink-mid)">Perempuan (Musyrifah)</span></label>
+          </div>
+        </div>
+        
+        <!-- DAFTAR SISWA — GRID LAYOUT (FIXED) -->
+        <div>
+          <label class="field-label">Daftar Siswa</label>
+          <!-- Header Grid -->
+          <div class="student-hdr">
+            <span>Nama Santri</span>
+            <span id="lbl-mulai">Mulai (Juz)</span>
+            <span id="lbl-hafalan">Sdh Hafal</span>
+            <span id="lbl-target">Target</span>
+            <span></span>
+          </div>
+          <div id="student-rows" class="space-y-2" data-testid="student-rows"></div>
+          <button type="button" onclick="addStudentRow()" class="btn-ghost mt-3 btn-sm" data-testid="add-student-btn"><i class="ph-bold ph-plus"></i> Tambah Siswa</button>
+        </div>
+
+        <button type="submit" class="btn-primary mt-2" data-testid="submit-setup"><i class="ph-bold ph-arrow-right"></i> Mulai Gunakan</button>
+      </form>
+      <div class="mt-6 pt-5" style="border-top:1px solid var(--border)">
+        <p class="text-xs text-center mb-3" style="color:var(--ink-soft)">Sudah punya backup?</p>
+        <input type="file" id="import-file-setup" accept=".json" class="hidden" onchange="doImport(event)">
+        <button class="btn-ghost" onclick="document.getElementById('import-file-setup').click()" data-testid="import-setup-btn"><i class="ph-bold ph-upload-simple"></i> Import Data (JSON)</button>
       </div>
-      <div><label class="field-label">Daftar Siswa</label>
-        <div class="text-xs mb-2 flex gap-2 px-1" style="color:var(--ink-faint)"><span class="flex-1">Nama</span><span style="width:70px;text-align:center">Hafalan</span><span style="width:70px;text-align:center">Target</span><span style="width:32px"></span></div>
-        <div id="student-rows" class="space-y-2" data-testid="student-rows"></div>
-        <button type="button" onclick="addStudentRow()" class="btn-ghost mt-3 btn-sm" data-testid="add-student-btn"><i class="ph-bold ph-plus"></i> Tambah Siswa</button>
-      </div>
-      <button type="submit" class="btn-primary mt-2" data-testid="submit-setup"><i class="ph-bold ph-arrow-right"></i> Mulai Gunakan</button>
-    </form>
-    <div class="mt-6 pt-5" style="border-top:1px solid var(--border)">
-      <p class="text-xs text-center mb-3" style="color:var(--ink-soft)">Sudah punya backup?</p>
-      <input type="file" id="import-file-setup" accept=".json" class="hidden" onchange="doImport(event)">
-      <button class="btn-ghost" onclick="document.getElementById('import-file-setup').click()" data-testid="import-setup-btn"><i class="ph-bold ph-upload-simple"></i> Import Data (JSON)</button>
     </div>
   </div>
 </section>
@@ -295,63 +356,66 @@ div:where(.swal2-container) div:where(.swal2-html-container) {
     <div class="sidebar-footer"><button class="sidebar-btn" onclick="toggleTheme()" data-testid="theme-toggle-sidebar" title="Ganti Tema"><i id="theme-icon-side" class="ph-bold ph-moon"></i> <span>Ganti Tema</span></button></div>
   </aside>
   <!-- HEADER -->
-  <header class="app-header mobile-only px-5 pt-5 pb-3 flex items-start justify-between" data-testid="mobile-header">
-    <div class="flex-1 pr-4">
+  <header class="app-header px-5 pt-5 pb-3 flex items-center justify-between" data-testid="main-header">
+    <div class="flex-1 pr-4 mobile-only">
       <p class="font-arabic text-sm" style="color:var(--gold);text-align:left">&#1581;&#1601;&#1592; &#1575;&#1604;&#1602;&#1585;&#1570;&#1606;</p>
       <h1 id="disp-halaqah" class="font-display text-xl font-bold leading-tight" style="color:var(--ink)">Halaqah</h1>
       <p class="text-xs mt-1 flex items-center gap-1.5" style="color:var(--teal)"><i class="ph-fill ph-user-circle text-base"></i><span id="disp-musyrif" class="font-semibold truncate">Musyrif</span></p>
     </div>
+    <div class="hidden desktop-only flex-1 pr-4">
+      <h1 class="font-display text-2xl font-bold leading-tight" style="color:var(--ink)">Sistem Mutaba'ah</h1>
+      <p class="text-sm mt-1 font-semibold" style="color:var(--ink-soft)"><span id="header-date"></span></p>
+    </div>
     <button class="action-btn" onclick="toggleTheme()" data-testid="theme-toggle-main"><i id="theme-icon-main" class="ph-bold ph-moon"></i></button>
   </header>
+  
   <!-- MAIN -->
-  <main class="app-main max-w-4xl mx-auto px-5 pb-28">
+  <main class="app-main max-w-7xl mx-auto px-5 pb-28 lg:pb-10">
 
     <!-- DASHBOARD -->
-    <section id="tab-dashboard" class="space-y-5 tab-section" data-testid="tab-dashboard">
-      <!-- Presensi -->
-      <div class="card p-5" data-testid="presensi-section">
-        <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
-          <h3 class="font-display font-semibold" style="color:var(--ink)"><i class="ph-bold ph-clipboard-text" style="color:var(--teal)"></i> Presensi Hari Ini</h3>
-          <div class="flex gap-2">
-            <button onclick="markAllPresent()" class="btn-ghost btn-sm" style="width:auto" data-testid="mark-all-btn"><i class="ph-bold ph-checks"></i> Semua Hadir</button>
-            <button onclick="resetPresensi()" class="btn-ghost btn-sm" style="width:auto;border-color:rgba(220,38,38,.3);color:var(--danger)" data-testid="reset-presensi-btn"><i class="ph-bold ph-arrow-counter-clockwise"></i> Reset</button>
-          </div>
+    <section id="tab-dashboard" class="space-y-5 lg:space-y-0 desktop-grid tab-section" data-testid="tab-dashboard">
+      <div class="space-y-5">
+        <div class="stats-grid grid grid-cols-2 gap-3" data-testid="stats-grid">
+          <div class="stat-card"><div class="stat-icon" style="background:var(--teal-light);color:var(--teal)"><i class="ph-bold ph-users"></i></div><div><div class="stat-value" style="color:var(--teal)" data-testid="stat-total">0</div><div class="stat-label">Total Siswa</div></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background:var(--gold-pale);color:var(--gold)"><i class="ph-bold ph-hand-waving"></i></div><div><div class="stat-value" style="color:var(--gold)" data-testid="stat-hadir">0</div><div class="stat-label">Hadir</div></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background:#dcfce7;color:#166534"><i class="ph-bold ph-check-circle"></i></div><div><div class="stat-value" style="color:#166534" data-testid="stat-sudah">0</div><div class="stat-label">Sudah Setor</div></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background:#fee2e2;color:#991b1b"><i class="ph-bold ph-hourglass"></i></div><div><div class="stat-value" style="color:var(--danger)" data-testid="stat-belum">0</div><div class="stat-label">Belum Setor</div></div></div>
         </div>
-        <div id="presensi-list" class="presensi-grid grid grid-cols-2 gap-2" data-testid="presensi-list"></div>
+        <div class="card p-5" data-testid="weekly-chart-section">
+          <h3 class="font-display font-semibold mb-3" style="color:var(--ink)"><i class="ph-bold ph-chart-bar" style="color:var(--gold)"></i> Aktivitas 7 Hari Terakhir</h3>
+          <div class="chart-wrap w-full max-w-none"><canvas id="chart-weekly" height="220"></canvas></div>
+        </div>
+        <div class="card p-5" data-testid="recent-section">
+          <h3 class="font-display font-semibold mb-3" style="color:var(--ink)">Aktivitas Terbaru</h3>
+          <div id="dash-recent" class="space-y-2"></div>
+        </div>
       </div>
-      <!-- Stats -->
-      <div class="stats-grid grid grid-cols-2 gap-3" data-testid="stats-grid">
-        <div class="stat-card"><div class="stat-icon" style="background:var(--teal-light);color:var(--teal)"><i class="ph-bold ph-users"></i></div><div><div class="stat-value" style="color:var(--teal)" data-testid="stat-total">0</div><div class="stat-label">Total Siswa</div></div></div>
-        <div class="stat-card"><div class="stat-icon" style="background:var(--gold-pale);color:var(--gold)"><i class="ph-bold ph-hand-waving"></i></div><div><div class="stat-value" style="color:var(--gold)" data-testid="stat-hadir">0</div><div class="stat-label">Hadir</div></div></div>
-        <div class="stat-card"><div class="stat-icon" style="background:#dcfce7;color:#166534"><i class="ph-bold ph-check-circle"></i></div><div><div class="stat-value" style="color:#166534" data-testid="stat-sudah">0</div><div class="stat-label">Sudah Setor</div></div></div>
-        <div class="stat-card"><div class="stat-icon" style="background:#fee2e2;color:#991b1b"><i class="ph-bold ph-hourglass"></i></div><div><div class="stat-value" style="color:var(--danger)" data-testid="stat-belum">0</div><div class="stat-label">Belum Setor</div></div></div>
-      </div>
-      <!-- Weekly Chart -->
-      <div class="card p-5" data-testid="weekly-chart-section">
-        <h3 class="font-display font-semibold mb-3" style="color:var(--ink)"><i class="ph-bold ph-chart-bar" style="color:var(--gold)"></i> Aktivitas 7 Hari Terakhir</h3>
-        <div class="chart-wrap"><canvas id="chart-weekly" height="180"></canvas></div>
-      </div>
-      <!-- Progress -->
-      <div class="card p-5" data-testid="progress-section">
-        <h3 class="font-display font-semibold mb-3" style="color:var(--ink)">Progress Target Hafalan</h3>
-        <div id="dash-progress" class="space-y-3"></div>
-      </div>
-      <!-- Recent -->
-      <div class="card p-5" data-testid="recent-section">
-        <h3 class="font-display font-semibold mb-3" style="color:var(--ink)">Aktivitas Terbaru</h3>
-        <div id="dash-recent" class="space-y-2"></div>
-      </div>
-      <!-- Attention -->
-      <div class="card p-5" data-testid="attention-section">
-        <h3 class="font-display font-semibold mb-3" style="color:var(--danger)"><i class="ph-bold ph-warning"></i> Siswa Perlu Perhatian</h3>
-        <div id="dash-attention" class="space-y-2"></div>
+      <div class="space-y-5">
+        <div class="card p-5" data-testid="presensi-section">
+          <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+            <h3 class="font-display font-semibold" style="color:var(--ink)"><i class="ph-bold ph-clipboard-text" style="color:var(--teal)"></i> Presensi Hari Ini</h3>
+            <div class="flex gap-2">
+              <button onclick="markAllPresent()" class="btn-ghost btn-sm px-2" style="width:auto" data-testid="mark-all-btn" title="Semua Hadir"><i class="ph-bold ph-checks text-lg"></i></button>
+              <button onclick="resetPresensi()" class="btn-ghost btn-sm px-2" style="width:auto;border-color:rgba(220,38,38,.3);color:var(--danger)" data-testid="reset-presensi-btn" title="Reset Presensi"><i class="ph-bold ph-arrow-counter-clockwise text-lg"></i></button>
+            </div>
+          </div>
+          <div id="presensi-list" class="presensi-grid grid grid-cols-2 gap-2" data-testid="presensi-list"></div>
+        </div>
+        <div class="card p-5" data-testid="progress-section">
+          <h3 class="font-display font-semibold mb-3" style="color:var(--ink)">Progress Target Hafalan</h3>
+          <div id="dash-progress" class="space-y-3"></div>
+        </div>
+        <div class="card p-5" data-testid="attention-section">
+          <h3 class="font-display font-semibold mb-3" style="color:var(--danger)"><i class="ph-bold ph-warning"></i> Siswa Perlu Perhatian</h3>
+          <div id="dash-attention" class="space-y-2"></div>
+        </div>
       </div>
     </section>
 
     <!-- ZIYADAH -->
-    <section id="tab-ziyadah" class="hidden space-y-5 tab-section" data-testid="tab-ziyadah">
-      <div class="edit-banner" id="z-edit-banner"><i class="ph-bold ph-pencil-simple"></i> Mode Edit — <button type="button" onclick="cancelEdit('z')" class="underline font-bold bg-transparent border-none p-0 cursor-pointer">Batal</button></div>
-      <div class="card p-5 sm:p-6">
+    <section id="tab-ziyadah" class="hidden tab-section max-w-4xl mx-auto" data-testid="tab-ziyadah">
+      <div class="edit-banner mb-4" id="z-edit-banner"><i class="ph-bold ph-pencil-simple"></i> Mode Edit — <button type="button" onclick="cancelEdit('z')" class="underline font-bold bg-transparent border-none p-0 cursor-pointer">Batal</button></div>
+      <div class="card p-5 sm:p-8">
         <div class="flex items-center gap-3 mb-5">
           <div style="width:36px;height:36px;background:var(--teal-light);border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--teal)"><i class="ph-bold ph-book-open-text text-lg"></i></div>
           <div><h2 class="font-display text-lg font-semibold" style="color:var(--ink)">Ziyadah &mdash; Hafalan Baru</h2><div class="gold-line mt-0.5"></div></div>
@@ -365,9 +429,15 @@ div:where(.swal2-container) div:where(.swal2-html-container) {
             <div class="col-span-2 relative"><label class="field-label">Surah</label><input id="z-surah-a" type="text" class="field" placeholder="Nama surah..." required data-testid="z-surah-a"><div id="z-err-a" class="field-error">Nama surah tidak dikenali</div><div id="z-ac-a" class="autocomplete-list"></div></div>
             <div><label class="field-label">Ayat</label><input id="z-ayat-a" type="text" class="field" placeholder="1-5" required data-testid="z-ayat-a"></div>
           </div>
-          <div class="flex items-center gap-3 py-1">
-            <div class="toggle-track" id="z-lintas" onclick="toggleLintas('z')" data-testid="z-lintas"><div class="toggle-knob"></div></div>
-            <span class="text-sm font-semibold" style="color:var(--ink-mid)">Lintas surah?</span>
+          <div class="flex items-center justify-between py-1 flex-wrap gap-3">
+            <div class="flex items-center gap-3">
+              <div class="toggle-track" id="z-lintas" onclick="toggleLintas('z')" data-testid="z-lintas"><div class="toggle-knob"></div></div>
+              <span class="text-sm font-semibold" style="color:var(--ink-mid)">Lintas surah?</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="toggle-track" id="z-mutqin" onclick="toggleMutqin('z')" data-testid="z-mutqin"><div class="toggle-knob"></div></div>
+              <span class="text-sm font-bold flex items-center gap-1" style="color:var(--gold)"><i class="ph-fill ph-star"></i> Mutqin</span>
+            </div>
           </div>
           <div id="z-blok-lintas" class="hidden grid grid-cols-3 gap-3 p-3 rounded-xl" style="background:var(--cream);border:1px solid var(--border)">
             <div class="col-span-2 relative"><label class="field-label">Sampai Surah</label><input id="z-surah-b" type="text" class="field" placeholder="Surah akhir..." data-testid="z-surah-b"><div id="z-err-b" class="field-error">Nama surah tidak dikenali</div><div id="z-ac-b" class="autocomplete-list"></div></div>
@@ -384,9 +454,9 @@ div:where(.swal2-container) div:where(.swal2-html-container) {
     </section>
 
     <!-- MURAJAAH -->
-    <section id="tab-murajaah" class="hidden space-y-5 tab-section" data-testid="tab-murajaah">
-      <div class="edit-banner" id="m-edit-banner"><i class="ph-bold ph-pencil-simple"></i> Mode Edit — <button type="button" onclick="cancelEdit('m')" class="underline font-bold bg-transparent border-none p-0 cursor-pointer">Batal</button></div>
-      <div class="card p-5 sm:p-6">
+    <section id="tab-murajaah" class="hidden tab-section max-w-4xl mx-auto" data-testid="tab-murajaah">
+      <div class="edit-banner mb-4" id="m-edit-banner"><i class="ph-bold ph-pencil-simple"></i> Mode Edit — <button type="button" onclick="cancelEdit('m')" class="underline font-bold bg-transparent border-none p-0 cursor-pointer">Batal</button></div>
+      <div class="card p-5 sm:p-8">
         <div class="flex items-center gap-3 mb-5">
           <div style="width:36px;height:36px;background:var(--gold-pale);border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--gold)"><i class="ph-bold ph-arrows-clockwise text-lg"></i></div>
           <div><h2 class="font-display text-lg font-semibold" style="color:var(--ink)">Murajaah &mdash; Ulangan</h2><div class="gold-line mt-0.5"></div></div>
@@ -396,14 +466,20 @@ div:where(.swal2-container) div:where(.swal2-html-container) {
             <div><label class="field-label">Santri</label><select id="m-nama" required class="field" data-testid="m-nama"><option value="" disabled selected>-- Pilih Santri --</option></select></div>
             <div><label class="field-label">Tanggal</label><div class="date-wrap"><input id="m-tarikh" type="date" required class="field" data-testid="m-tarikh"><i class="ph-bold ph-calendar date-icon"></i></div></div>
           </div>
-          <div><label class="field-label">Jenis Murajaah</label><select id="m-jenis" required class="field" data-testid="m-jenis"><option value="Murajaah Fardi">Murajaah Fardi</option><option value="Murajaah Bersama">Murajaah Ma'az Zamiil</option></select></div>
+          <div><label class="field-label">Jenis Murajaah</label><select id="m-jenis" required class="field" data-testid="m-jenis"><option value="Murajaah Fardi">Murajaah Fardi</option><option value="Murajaah Bersama">Murajaah Ma'az Zamiil</option><option value="Tasmi' Mutqin">Tasmi' Mutqin (Ujian Hafalan)</option></select></div>
           <div class="grid grid-cols-3 gap-3">
             <div class="col-span-2 relative"><label class="field-label">Surah</label><input id="m-surah-a" type="text" class="field" placeholder="Nama surah..." required data-testid="m-surah-a"><div id="m-err-a" class="field-error">Nama surah tidak dikenali</div><div id="m-ac-a" class="autocomplete-list"></div></div>
             <div><label class="field-label">Ayat</label><input id="m-ayat-a" type="text" class="field" placeholder="1-5" required data-testid="m-ayat-a"></div>
           </div>
-          <div class="flex items-center gap-3 py-1">
-            <div class="toggle-track" id="m-lintas" onclick="toggleLintas('m')" data-testid="m-lintas"><div class="toggle-knob"></div></div>
-            <span class="text-sm font-semibold" style="color:var(--ink-mid)">Lintas surah?</span>
+          <div class="flex items-center justify-between py-1 flex-wrap gap-3">
+            <div class="flex items-center gap-3">
+              <div class="toggle-track" id="m-lintas" onclick="toggleLintas('m')" data-testid="m-lintas"><div class="toggle-knob"></div></div>
+              <span class="text-sm font-semibold" style="color:var(--ink-mid)">Lintas surah?</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="toggle-track" id="m-mutqin" onclick="toggleMutqin('m')" data-testid="m-mutqin"><div class="toggle-knob"></div></div>
+              <span class="text-sm font-bold flex items-center gap-1" style="color:var(--gold)"><i class="ph-fill ph-star"></i> Mutqin</span>
+            </div>
           </div>
           <div id="m-blok-lintas" class="hidden grid grid-cols-3 gap-3 p-3 rounded-xl" style="background:var(--cream);border:1px solid var(--border)">
             <div class="col-span-2 relative"><label class="field-label">Sampai Surah</label><input id="m-surah-b" type="text" class="field" placeholder="Surah akhir..." data-testid="m-surah-b"><div id="m-err-b" class="field-error">Nama surah tidak dikenali</div><div id="m-ac-b" class="autocomplete-list"></div></div>
@@ -446,7 +522,8 @@ div:where(.swal2-container) div:where(.swal2-html-container) {
       <div class="pengaturan-card"><h3 class="font-semibold mb-3" style="color:var(--ink)"><i class="ph-bold ph-file-csv" style="color:#16a34a"></i> Export Data Excel (CSV)</h3><p class="text-xs mb-3" style="color:var(--ink-soft)">Download riwayat setoran dan presensi dalam format CSV.</p><div class="flex gap-2"><button onclick="exportCSV()" class="btn-ghost" style="color:#16a34a;border-color:#16a34a"><i class="ph-bold ph-download-simple"></i> Setoran</button><button onclick="exportPresensiCSV()" class="btn-ghost" style="color:#3b82f6;border-color:#3b82f6"><i class="ph-bold ph-download-simple"></i> Presensi</button></div></div>
       <div class="pengaturan-card"><h3 class="font-semibold mb-3" style="color:var(--ink)"><i class="ph-bold ph-upload-simple" style="color:var(--gold)"></i> Import Data</h3><input type="file" id="import-file-settings" accept=".json" class="hidden" onchange="doImport(event)"><button onclick="document.getElementById('import-file-settings').click()" class="btn-ghost" data-testid="import-btn"><i class="ph-bold ph-upload-simple"></i> Pilih File JSON</button></div>
       <div class="pengaturan-card"><h3 class="font-semibold mb-3" style="color:var(--ink)"><i class="ph-bold ph-pencil-simple" style="color:var(--teal-mid)"></i> Edit Pengaturan Kelas</h3><button onclick="goToSetupConfirm()" class="btn-ghost" data-testid="edit-settings-btn"><i class="ph-bold ph-pencil-simple"></i> Edit Pengaturan</button></div>
-      <div class="pengaturan-card" style="border-color:rgba(220,38,38,.3)"><h3 class="font-semibold mb-3" style="color:var(--danger)"><i class="ph-bold ph-trash"></i> Hapus Semua Rekod</h3><button onclick="clearData()" class="btn-danger" data-testid="clear-data-btn"><i class="ph-bold ph-trash"></i> Hapus Semua Rekod Setoran</button></div>
+      <div class="pengaturan-card" style="border-color:rgba(220,38,38,.3)"><h3 class="font-semibold mb-3" style="color:var(--danger)"><i class="ph-bold ph-trash"></i> Hapus Semua Rekod</h3><button onclick="clearData()" class="btn-danger" data-testid="clear-data-btn"><i class="ph-bold ph-trash"></i> Hapus Rekod Setoran Saja</button></div>
+      <div class="pengaturan-card" style="border-color:rgba(220,38,38,.8);background:linear-gradient(135deg, rgba(220,38,38,0.05), transparent)"><h3 class="font-semibold mb-3" style="color:var(--danger)"><i class="ph-bold ph-warning-octagon"></i> Reset Pabrik (Hard Reset)</h3><p class="text-xs mb-3" style="color:var(--ink-soft)">Menghapus SELURUH data santri, setoran, dan pengaturan. Aplikasi akan kembali seperti baru pertama diinstall.</p><button onclick="hardResetApp()" class="btn-danger" style="background:var(--danger)" data-testid="hard-reset-btn"><i class="ph-bold ph-power"></i> Reset Total Aplikasi</button></div>
     </section>
   </main>
   <!-- BOTTOM NAV -->
@@ -560,7 +637,7 @@ const MONTHS=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus'
 
 // ─── STATE ──────────────────────────────────
 const SK='sijil_settings_v4',DK='sijil_records_v4',PK='sijil_presensi_';
-let currentTab='dashboard',zEditId=null,mEditId=null,zLintasOn=false,mLintasOn=false,modalStudent='',weeklyChart=null,modalChart=null,modalLimit=10;
+let currentTab='dashboard',zEditId=null,mEditId=null,zLintasOn=false,mLintasOn=false,zMutqinOn=false,mMutqinOn=false,modalStudent='',weeklyChart=null,modalChart=null,modalLimit=10;
 
 // ─── UTILITY ────────────────────────────────
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
@@ -592,117 +669,130 @@ function getSiswaNames(s){if(!s||!s.siswa)return[];return s.siswa.map(st=>typeof
 function getSiswaObj(s,nm){if(!s||!s.siswa)return null;const st=s.siswa.find(x=>(typeof x==='string'?x:x.nama)===nm);if(!st)return null;return typeof st==='string'?{nama:st,hafalanAwal:0,targetHafalan:0}:st}
 function getLabel(s){return(s&&s.gender==='perempuan')?'Musyrifah':'Musyrif'}
 
-// ─── ONBOARDING / WELCOME ───────────────────
+// ─── ONBOARDING ─────────────────────────────
 function showWelcomeAlert() {
   try {
     Swal.fire({
       title: '<span class="font-display font-bold" style="color:var(--teal); font-size:1.75rem;">Ahlan wa Sahlan! ✨</span>',
-      html: `
-        <div style="text-align:center; padding:0 8px;">
-          <div style="width:72px; height:72px; background:var(--teal-light); color:var(--teal); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:2.5rem; margin:0 auto 16px;">
-            <i class="ph-duotone ph-book-open-text"></i>
-          </div>
-          <p style="font-size:0.95rem; color:var(--ink); margin-bottom:12px; font-weight:700;">Selamat datang di Sijil Mutaba'ah.</p>
-          <p style="font-size:0.85rem; color:var(--ink-soft); line-height:1.6;">Aplikasi pencatatan hafalan Al-Qur'an ini dirancang berjalan <b>100% offline, super cepat, dan rahasia</b>. Semua data hanya disimpan di dalam perangkat Anda tanpa server.</p>
-        </div>
-      `,
+      html: `<div style="text-align:center; padding:0 8px;"><div style="width:72px; height:72px; background:var(--teal-light); color:var(--teal); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:2.5rem; margin:0 auto 16px;"><i class="ph-duotone ph-book-open-text"></i></div><p style="font-size:0.95rem; color:var(--ink); margin-bottom:12px; font-weight:700;">Selamat datang di Sijil Mutaba'ah.</p><p style="font-size:0.85rem; color:var(--ink-soft); line-height:1.6;">Aplikasi pencatatan hafalan Al-Qur'an ini dirancang berjalan <b>100% offline, super cepat, dan rahasia</b>. Semua data hanya disimpan di dalam perangkat Anda tanpa server.</p></div>`,
       showCancelButton: true,
       confirmButtonText: '<i class="ph-bold ph-book-open text-lg"></i> Baca Panduan (Penting)',
       cancelButtonText: 'Nanti saja, Mulai Sekarang',
       buttonsStyling: false,
-      customClass: {
-        confirmButton: 'btn-primary w-full',
-        cancelButton: 'btn-faded w-full',
-        actions: 'flex flex-col gap-3 w-full mt-8 px-4 sm:px-8 box-border'
-      },
-      allowOutsideClick: false,
-      allowEscapeKey: false
-    }).then((result) => {
-      if (result.isConfirmed) showGuideAlert();
-      else finishWelcome();
-    }).catch(() => finishWelcome());
+      customClass: { confirmButton: 'btn-primary w-full', cancelButton: 'btn-faded w-full', actions: 'flex flex-col gap-3 w-full mt-8 px-4 sm:px-8 box-border' },
+      allowOutsideClick: false, allowEscapeKey: false
+    }).then((result) => { if (result.isConfirmed) showGuideAlert(); else finishWelcome(); }).catch(() => finishWelcome());
   } catch (e) { finishWelcome(); }
 }
-
 function showGuideAlert() {
   try {
     Swal.fire({
       title: '<span class="font-display font-bold" style="color:var(--teal); font-size:1.5rem;">Panduan Penggunaan 📖</span>',
-      html: `
-        <div style="text-align:left; font-size:0.9rem; line-height:1.6; max-height:65vh; overflow-y:auto; padding-right:8px; color:var(--ink-mid);">
-          <p style="color:var(--ink-soft); margin-bottom:18px; font-size:0.85rem;">Agar aplikasi berjalan optimal dan data Anda aman, mohon perhatikan dua hal berikut:</p>
-
-          <!-- Instalasi -->
-          <h4 style="font-weight:800; color:var(--teal); display:flex; align-items:center; gap:8px; margin-bottom:10px;">
-            <div style="background:var(--teal-light); width:28px; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center;"><i class="ph-bold ph-download-simple text-base"></i></div>
-            1. Instalasi (Akses Layar Utama)
-          </h4>
-          <div style="background:var(--cream); border:1px solid var(--border); border-radius:16px; padding:16px; margin-bottom:24px;">
-            <div style="margin-bottom:14px;">
-              <strong style="color:var(--ink); display:flex; align-items:center; gap:6px; font-size:0.95rem;"><i class="ph-fill ph-apple-logo text-xl"></i> iOS (iPhone/iPad)</strong>
-              <ul style="margin:6px 0 0 28px; padding:0; list-style:disc; color:var(--ink-soft); font-size:0.85rem;">
-                <li>Buka aplikasi di browser <b>Safari</b>.</li>
-                <li>Tekan tombol <b>Share</b> <i class="ph-bold ph-export align-middle"></i> di bilah bawah.</li>
-                <li>Geser ke bawah dan pilih <b>"Add to Home Screen"</b>.</li>
-              </ul>
-            </div>
-            <div style="border-top:1px dashed var(--border); padding-top:14px;">
-              <strong style="color:var(--ink); display:flex; align-items:center; gap:6px; font-size:0.95rem;"><i class="ph-fill ph-android-logo text-xl" style="color:#10b981"></i> Android</strong>
-              <ul style="margin:6px 0 0 28px; padding:0; list-style:disc; color:var(--ink-soft); font-size:0.85rem;">
-                <li>Buka aplikasi di browser <b>Chrome</b>.</li>
-                <li>Tekan ikon <b>Menu ⋮</b> di pojok kanan atas.</li>
-                <li>Pilih <b>"Add to Home screen"</b> atau <b>"Install app"</b>.</li>
-              </ul>
-            </div>
-          </div>
-
-          <!-- Penyimpanan -->
-          <h4 style="font-weight:800; color:var(--danger); display:flex; align-items:center; gap:8px; margin-bottom:10px;">
-            <div style="background:rgba(220,38,38,0.1); color:var(--danger); width:28px; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center;"><i class="ph-bold ph-warning-circle text-base"></i></div>
-            2. Manajemen Data (Sangat Penting)
-          </h4>
-          <div style="background:rgba(220,38,38,0.05); border:1px solid rgba(220,38,38,0.2); border-radius:16px; padding:16px; margin-bottom:8px;">
-            <p style="margin-bottom:10px; font-size:0.85rem; color:var(--danger); font-weight:700;">Data mutaba'ah disimpan <u>hanya di perangkat ini</u>. Data akan HILANG PERMANEN jika Anda:</p>
-            <ul style="margin:0 0 14px 28px; padding:0; list-style:disc; font-size:0.85rem; color:var(--danger);">
-              <li>Membersihkan <i>Cache / Browsing Data</i> Browser.</li>
-              <li>Mereset HP atau menggunakan Mode Samaran (Incognito).</li>
-            </ul>
-            <div style="background:var(--white); padding:12px; border-radius:12px; border:1px solid var(--border); font-size:0.85rem; display:flex; gap:10px; align-items:flex-start;">
-              <i class="ph-fill ph-lightbulb text-xl flex-shrink-0" style="color:#f59e0b"></i>
-              <p style="margin:0; color:var(--ink-mid); line-height:1.5;"><b>Solusi Aman:</b> Lakukan <b>Backup Data JSON</b> secara rutin (misal tiap pekan) di menu <i class="ph-bold ph-gear"></i> <b>Pengaturan</b>. Simpan file tersebut di tempat aman untuk berjaga-jaga.</p>
-            </div>
-          </div>
-        </div>
-      `,
+      html: `<div style="text-align:left; font-size:0.9rem; line-height:1.6; max-height:65vh; overflow-y:auto; padding-right:8px; color:var(--ink-mid);"><p style="color:var(--ink-soft); margin-bottom:18px; font-size:0.85rem;">Agar aplikasi berjalan optimal dan data Anda aman, mohon perhatikan dua hal berikut:</p><h4 style="font-weight:800; color:var(--teal); display:flex; align-items:center; gap:8px; margin-bottom:10px;"><div style="background:var(--teal-light); width:28px; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center;"><i class="ph-bold ph-download-simple text-base"></i></div>1. Instalasi (Akses Layar Utama)</h4><div style="background:var(--cream); border:1px solid var(--border); border-radius:16px; padding:16px; margin-bottom:24px;"><div style="margin-bottom:14px;"><strong style="color:var(--ink); display:flex; align-items:center; gap:6px; font-size:0.95rem;"><i class="ph-fill ph-apple-logo text-xl"></i> iOS (iPhone/iPad)</strong><ul style="margin:6px 0 0 28px; padding:0; list-style:disc; color:var(--ink-soft); font-size:0.85rem;"><li>Buka aplikasi di browser <b>Safari</b>.</li><li>Tekan tombol <b>Share</b> di bilah bawah.</li><li>Geser ke bawah dan pilih <b>"Add to Home Screen"</b>.</li></ul></div><div style="border-top:1px dashed var(--border); padding-top:14px;"><strong style="color:var(--ink); display:flex; align-items:center; gap:6px; font-size:0.95rem;"><i class="ph-fill ph-android-logo text-xl" style="color:#10b981"></i> Android</strong><ul style="margin:6px 0 0 28px; padding:0; list-style:disc; color:var(--ink-soft); font-size:0.85rem;"><li>Buka aplikasi di browser <b>Chrome</b>.</li><li>Tekan ikon <b>Menu ⋮</b> di pojok kanan atas.</li><li>Pilih <b>"Add to Home screen"</b> atau <b>"Install app"</b>.</li></ul></div></div><h4 style="font-weight:800; color:var(--danger); display:flex; align-items:center; gap:8px; margin-bottom:10px;"><div style="background:rgba(220,38,38,0.1); color:var(--danger); width:28px; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center;"><i class="ph-bold ph-warning-circle text-base"></i></div>2. Manajemen Data (Sangat Penting)</h4><div style="background:rgba(220,38,38,0.05); border:1px solid rgba(220,38,38,0.2); border-radius:16px; padding:16px; margin-bottom:8px;"><p style="margin-bottom:10px; font-size:0.85rem; color:var(--danger); font-weight:700;">Data mutaba'ah disimpan <u>hanya di perangkat ini</u>. Data akan HILANG PERMANEN jika Anda:</p><ul style="margin:0 0 14px 28px; padding:0; list-style:disc; font-size:0.85rem; color:var(--danger);"><li>Membersihkan <i>Cache / Browsing Data</i> Browser.</li><li>Mereset HP atau menggunakan Mode Samaran (Incognito).</li></ul><div style="background:var(--white); padding:12px; border-radius:12px; border:1px solid var(--border); font-size:0.85rem; display:flex; gap:10px; align-items:flex-start;"><i class="ph-fill ph-lightbulb text-xl flex-shrink-0" style="color:#f59e0b"></i><p style="margin:0; color:var(--ink-mid); line-height:1.5;"><b>Solusi Aman:</b> Lakukan <b>Backup Data JSON</b> secara rutin di menu <b>Pengaturan</b>.</p></div></div></div>`,
       confirmButtonText: '<i class="ph-bold ph-check-circle text-lg"></i> Saya Mengerti & Mulai',
       buttonsStyling: false,
-      customClass: {
-        confirmButton: 'btn-primary w-full',
-        popup: 'swal-custom-popup w-full max-w-2xl'
-      },
-      allowOutsideClick: false,
-      allowEscapeKey: false
-    }).then(() => {
-      finishWelcome();
-    }).catch(() => finishWelcome());
+      customClass: { confirmButton: 'btn-primary w-full', popup: 'swal-custom-popup w-full max-w-2xl' },
+      allowOutsideClick: false, allowEscapeKey: false
+    }).then(() => { finishWelcome(); }).catch(() => finishWelcome());
   } catch (e) { finishWelcome(); }
 }
+function finishWelcome() { localStorage.setItem('sijil_welcome_seen', 'true'); continueInit(); }
 
-function finishWelcome() {
-  localStorage.setItem('sijil_welcome_seen', 'true');
-  continueInit();
-}
-
-// ─── THEME & SIDEBAR ──────────────────────────────────
+// ─── THEME & SIDEBAR ────────────────────────
 (function(){const t=localStorage.theme,sys=window.matchMedia('(prefers-color-scheme:dark)').matches;if(t==='dark'||(t===undefined&&sys)){document.documentElement.classList.add('dark');document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('[id^="theme-icon"]').forEach(i=>i.className='ph-bold ph-sun');const m=document.getElementById('meta-theme-color');if(m)m.setAttribute('content','#0b1414')})}if(localStorage.sidebar_collapsed==='true')document.body.classList.add('sidebar-collapsed');})();
 function toggleTheme(){const d=document.documentElement.classList.toggle('dark');localStorage.theme=d?'dark':'light';document.querySelectorAll('[id^="theme-icon"]').forEach(i=>i.className=d?'ph-bold ph-sun':'ph-bold ph-moon');const m=document.getElementById('meta-theme-color');if(m)m.setAttribute('content',d?'#0b1414':'#faf6ee');if(currentTab==='dashboard')renderDashboard();if(currentTab==='laporan')renderLaporan()}
 function toggleSidebar(){const isC=document.body.classList.toggle('sidebar-collapsed');localStorage.sidebar_collapsed=isC;setTimeout(()=>window.dispatchEvent(new Event('resize')),300);}
 
-// ─── STUDENT ROWS (SETUP) ───────────────────
-function addStudentRow(nm='',h=0,t=0){const c=document.getElementById('student-rows');const i=c.children.length;const r=document.createElement('div');r.className='student-row';r.innerHTML=`<input type="text" class="field" style="flex:1;min-width:0" placeholder="Nama" value="${esc(nm)}" required data-testid="student-name-${i}"><input type="number" class="field" style="width:70px" placeholder="0" value="${h}" min="0" max="30" data-testid="student-hafalan-${i}"><input type="number" class="field" style="width:70px" placeholder="0" value="${t}" min="0" max="30" data-testid="student-target-${i}"><button type="button" class="row-del-btn" onclick="this.parentElement.remove()" data-testid="student-delete-${i}" ${i===0?'style="visibility:hidden"':''}><i class="ph-bold ph-x"></i></button>`;c.appendChild(r)}
-function getStudentData(){const rows=document.querySelectorAll('#student-rows .student-row');const s=[];rows.forEach(r=>{const inp=r.querySelectorAll('input');const nm=inp[0].value.trim();if(nm)s.push({nama:nm,hafalanAwal:parseInt(inp[1].value)||0,targetHafalan:parseInt(inp[2].value)||0})});return s}
+// ─── STUDENT ROWS — SETUP AUTOCOMPLETE ──────
+function setupFormAC(inputId, listId) {
+  const inp=document.getElementById(inputId), lst=document.getElementById(listId);
+  if(!inp||!lst) return;
+  inp.addEventListener('input',function(){
+    if(document.getElementById('s-metode').value!=='surah')return;
+    const v=this.value;lst.innerHTML='';if(!v){lst.classList.remove('show');return}
+    const hits=SURAH_DATA.filter(s=>s.n.toLowerCase().includes(v.toLowerCase()));
+    if(hits.length){
+      lst.classList.add('show');
+      hits.forEach(s=>{
+        const d=document.createElement('div');d.className='autocomplete-item';
+        d.innerHTML=s.n.replace(new RegExp(v.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'),m=>`<strong>${m}</strong>`);
+        d.onmousedown=e=>{e.preventDefault();inp.value=s.n;lst.classList.remove('show');};
+        lst.appendChild(d);
+      });
+    }else lst.classList.remove('show');
+  });
+  document.addEventListener('click',e=>{if(e.target!==inp)lst.classList.remove('show')});
+  inp.addEventListener('blur',()=>setTimeout(()=>lst.classList.remove('show'),150));
+}
 
-// ─── INIT ───────────────────────────────────
+// ─── ADD STUDENT ROW (FIXED: CSS Grid) ──────
+function addStudentRow(nm='',mVal='',h='',t=''){
+  const c=document.getElementById('student-rows');
+  const i=uid();
+  const r=document.createElement('div');
+  r.className='student-row-grid';
+
+  const m=document.getElementById('s-metode').value;
+  const isS=m==='surah';
+  const tType=isS?'text':'number';
+  const p0=isS?'An-Nas':'1';
+  const p1=isS?'Al-Humazah':'5';
+  const p2=isS?'Al-Buruj':'15';
+
+  r.innerHTML=`
+    <input type="text" class="field" placeholder="Nama Santri" value="${esc(nm)}" required data-testid="student-name-${i}">
+    <div class="relative">
+      <input type="${tType}" class="field text-center" placeholder="${p0}" value="${esc(mVal)}" id="m-inp-${i}">
+      <div id="m-ac-${i}" class="autocomplete-list"></div>
+    </div>
+    <div class="relative">
+      <input type="${tType}" class="field text-center" placeholder="${p1}" value="${esc(h)}" id="h-inp-${i}">
+      <div id="h-ac-${i}" class="autocomplete-list"></div>
+    </div>
+    <div class="relative">
+      <input type="${tType}" class="field text-center" placeholder="${p2}" value="${esc(t)}" id="t-inp-${i}">
+      <div id="t-ac-${i}" class="autocomplete-list"></div>
+    </div>
+    <button type="button" class="row-del-btn" onclick="delOrClearRow(this)" data-testid="student-delete-${i}" title="Hapus">
+      <i class="ph-bold ph-x"></i>
+    </button>
+  `;
+  c.appendChild(r);
+  setupFormAC(`m-inp-${i}`,`m-ac-${i}`);
+  setupFormAC(`h-inp-${i}`,`h-ac-${i}`);
+  setupFormAC(`t-inp-${i}`,`t-ac-${i}`);
+}
+
+function delOrClearRow(btn){
+  const c=document.getElementById('student-rows');
+  if(c.children.length===1){
+    // Satu-satunya baris: kosongkan field, jangan hapus row-nya
+    btn.parentElement.querySelectorAll('input').forEach(inp=>inp.value='');
+  } else {
+    btn.parentElement.remove();
+  }
+}
+
+function getStudentData(){
+  const m=document.getElementById('s-metode').value;
+  const isS=m==='surah';
+  const rows=document.querySelectorAll('#student-rows .student-row-grid');
+  const s=[];
+  rows.forEach(r=>{
+    const inps=r.querySelectorAll('input');
+    const nm=inps[0].value.trim();
+    if(nm){
+      let mH=inps[1].value.trim();
+      let hA=inps[2].value.trim();
+      let tH=inps[3].value.trim();
+      if(!isS){mH=parseInt(mH)||'';hA=parseInt(hA)||'';tH=parseInt(tH)||'';}
+      s.push({nama:nm,mulaiHafalan:mH,hafalanAwal:hA,targetHafalan:tH});
+    }
+  });
+  return s;
+}
+
+// ─── INIT ────────────────────────────────────
 function init(){
   if(!localStorage.getItem('sijil_welcome_seen')){
     setTimeout(() => { if (!localStorage.getItem('sijil_welcome_seen')) finishWelcome(); }, 15000);
@@ -711,9 +801,11 @@ function init(){
   }
   continueInit();
 }
-
 function continueInit(){
   const s=settings();
+  const dOpt={weekday:'long',year:'numeric',month:'long',day:'numeric'};
+  const hDate=document.getElementById('header-date');
+  if(hDate)hDate.textContent=new Date().toLocaleDateString('id-ID',dOpt);
   if(!s||!s.halaqah){document.getElementById('form-setup').reset();document.getElementById('student-rows').innerHTML='';addStudentRow();show('pg-setup');hide('pg-app');return}
   hide('pg-setup');show('pg-app');
   const lb=getLabel(s);
@@ -729,39 +821,47 @@ function continueInit(){
 }
 document.getElementById('form-setup').addEventListener('submit',function(e){e.preventDefault();const h=document.getElementById('s-halaqah').value.trim(),g=document.getElementById('s-guru').value.trim(),gd=document.querySelector('input[name="gender"]:checked').value,mp=document.getElementById('s-metode').value,ss=getStudentData();if(!ss.length)return Swal.fire('Perhatian','Minimal 1 siswa','warning');saveSets({halaqah:h,guru:g,gender:gd,metodeProgress:mp,siswa:ss});Swal.fire({icon:'success',title:'Siap!',timer:1200,showConfirmButton:false}).then(continueInit)});
 
-// ─── DROPDOWN ───────────────────────────────
-function fillDropdown(id,list){const sel=document.getElementById(id);sel.innerHTML='<option value="" disabled selected>-- Pilih Santri --</option>';if(list)[...list].sort().forEach(n=>sel.insertAdjacentHTML('beforeend',`<option value="${esc(n)}">${esc(n)}</option>`))}
+// ─── DROPDOWN ────────────────────────────────
+function fillDropdown(id,list){const sel=document.getElementById(id);if(!sel)return;sel.innerHTML='<option value="" disabled selected>-- Pilih Santri --</option>';if(list)[...list].sort().forEach(n=>sel.insertAdjacentHTML('beforeend',`<option value="${esc(n)}">${esc(n)}</option>`))}
 
-// ─── AUTOCOMPLETE & VALIDATION ──────────────
+// ─── AUTOCOMPLETE & VALIDATION ───────────────
 function setupAC(inputId,listId,errId,prefix){
   const inp=document.getElementById(inputId),lst=document.getElementById(listId);
+  if(!inp||!lst)return;
   inp.addEventListener('input',function(){const v=this.value;lst.innerHTML='';if(!v){lst.classList.remove('show');return}const hits=SURAH_DATA.filter(s=>s.n.toLowerCase().includes(v.toLowerCase()));if(hits.length){lst.classList.add('show');hits.forEach(s=>{const d=document.createElement('div');d.className='autocomplete-item';d.innerHTML=s.n.replace(new RegExp(v.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'),m=>`<strong>${m}</strong>`);d.onmousedown=e=>{e.preventDefault();inp.value=s.n;lst.classList.remove('show');valSurah(inputId,errId);updateJuz(prefix)};lst.appendChild(d)})}else lst.classList.remove('show')});
   document.addEventListener('click',e=>{if(e.target!==inp)lst.classList.remove('show')});
   inp.addEventListener('blur',()=>setTimeout(()=>{lst.classList.remove('show');if(valSurah(inputId,errId))updateJuz(prefix)},150));
 }
-function valSurah(iid,eid){const inp=document.getElementById(iid),err=document.getElementById(eid);if(!inp.value){inp.classList.remove('error');err.classList.remove('show');return true}if(SURAH.includes(inp.value)){inp.classList.remove('error');err.classList.remove('show');return true}const m=SURAH.find(s=>s.toLowerCase()===inp.value.toLowerCase());if(m){inp.value=m;inp.classList.remove('error');err.classList.remove('show');return true}inp.classList.add('error');err.classList.add('show');return false}
-function checkAyat(sid,aid){const sN=document.getElementById(sid).value,aV=document.getElementById(aid).value;if(!sN||!aV)return true;const sD=SURAH_DATA.find(s=>s.n===sN);if(!sD)return true;const ns=aV.match(/\d+/g);if(!ns)return true;if(Math.max(...ns.map(Number))>sD.a){Swal.fire({icon:'warning',title:'Ayat Melebihi Batas',text:`${sD.n} hanya ${sD.a} ayat.`});document.getElementById(aid).value='';return false}return true}
+function valSurah(iid,eid){const inp=document.getElementById(iid),err=document.getElementById(eid);if(!inp||!err)return true;if(!inp.value){inp.classList.remove('error');err.classList.remove('show');return true}if(SURAH.includes(inp.value)){inp.classList.remove('error');err.classList.remove('show');return true}const m=SURAH.find(s=>s.toLowerCase()===inp.value.toLowerCase());if(m){inp.value=m;inp.classList.remove('error');err.classList.remove('show');return true}inp.classList.add('error');err.classList.add('show');return false}
+function checkAyat(sid,aid){const snEl=document.getElementById(sid),aEl=document.getElementById(aid);if(!snEl||!aEl)return true;const sN=snEl.value,aV=aEl.value;if(!sN||!aV)return true;const sD=SURAH_DATA.find(s=>s.n===sN);if(!sD)return true;const ns=aV.match(/\d+/g);if(!ns)return true;if(Math.max(...ns.map(Number))>sD.a){Swal.fire({icon:'warning',title:'Ayat Melebihi Batas',text:`${sD.n} hanya ${sD.a} ayat.`});aEl.value='';return false}return true}
 
-// Setup ACs
 setupAC('z-surah-a','z-ac-a','z-err-a','z');setupAC('z-surah-b','z-ac-b','z-err-b','z');
 setupAC('m-surah-a','m-ac-a','m-err-a','m');setupAC('m-surah-b','m-ac-b','m-err-b','m');
-// Ayat blur
-['z','m'].forEach(p=>{document.getElementById(p+'-ayat-a').addEventListener('blur',()=>{checkAyat(p+'-surah-a',p+'-ayat-a');updateJuz(p)});document.getElementById(p+'-ayat-b').addEventListener('blur',()=>{checkAyat(p+'-surah-b',p+'-ayat-b');updateJuz(p)})});
+function findSurahIndex(n){if(!n)return -1;const clean=String(n).trim().toLowerCase();return SURAH.findIndex(s=>s.toLowerCase()===clean);}
 
-// ─── JUZ ────────────────────────────────────
+['z','m'].forEach(p=>{
+  const a1=document.getElementById(p+'-ayat-a'),a2=document.getElementById(p+'-ayat-b');
+  if(a1)a1.addEventListener('blur',()=>{checkAyat(p+'-surah-a',p+'-ayat-a');updateJuz(p)});
+  if(a2)a2.addEventListener('blur',()=>{checkAyat(p+'-surah-b',p+'-ayat-b');updateJuz(p)});
+});
+
+// ─── JUZ ─────────────────────────────────────
 function hitungJuz(sn,ai){const sD=SURAH_DATA.find(s=>s.n===sn);if(!sD)return null;if(!ai)return{s:sD.js,e:sD.je};const ns=ai.match(/\d+/g);if(!ns)return{s:sD.js,e:sD.je};const mn=Math.min(...ns.map(Number)),mx=Math.max(...ns.map(Number));if(sn==="Al-Baqarah"){let a=mn<=141?1:mn<=252?2:3,b=mx<=141?1:mx<=252?2:3;return{s:a,e:b}}if(sn==="Ali 'Imran")return{s:mn<=92?3:4,e:mx<=92?3:4};if(sn==="An-Nisa'"){let a=mn<=23?4:mn<=147?5:6,b=mx<=23?4:mx<=147?5:6;return{s:a,e:b}}if(sn==="Al-Ma'idah")return{s:mn<=81?6:7,e:mx<=81?6:7};if(sn==="Al-An'am")return{s:mn<=110?7:8,e:mx<=110?7:8};if(sn==="Al-A'raf")return{s:mn<=87?8:9,e:mx<=87?8:9};if(sn==="Al-Anfal")return{s:mn<=40?9:10,e:mx<=40?9:10};if(sn==="At-Taubah")return{s:mn<=92?10:11,e:mx<=92?10:11};return{s:sD.js,e:sD.je}}
-function updateJuz(p){const s1=document.getElementById(p+'-surah-a').value,a1=document.getElementById(p+'-ayat-a').value,jA=hitungJuz(s1,a1);if(!jA)return;let fS=jA.s,fE=jA.e;const isL=p==='z'?zLintasOn:mLintasOn;if(isL){const s2=document.getElementById(p+'-surah-b').value,a2=document.getElementById(p+'-ayat-b').value,jB=hitungJuz(s2,a2);if(jB){fS=Math.min(jA.s,jB.s);fE=Math.max(jA.e,jB.e)}}document.getElementById(p+'-juz').value=fS===fE?fS:`${fS}-${fE}`}
+function updateJuz(p){const saEl=document.getElementById(p+'-surah-a'),aaEl=document.getElementById(p+'-ayat-a'),jEl=document.getElementById(p+'-juz');if(!saEl||!aaEl||!jEl)return;const s1=saEl.value,a1=aaEl.value,jA=hitungJuz(s1,a1);if(!jA)return;let fS=jA.s,fE=jA.e;const isL=p==='z'?zLintasOn:mLintasOn;if(isL){const s2=document.getElementById(p+'-surah-b').value,a2=document.getElementById(p+'-ayat-b').value,jB=hitungJuz(s2,a2);if(jB){fS=Math.min(jA.s,jB.s);fE=Math.max(jA.e,jB.e)}}jEl.value=fS===fE?fS:`${fS}-${fE}`}
 
-// ─── LINTAS ─────────────────────────────────
+// ─── LINTAS & MUTQIN ─────────────────────────
 function toggleLintas(p){
   if(p==='z'){zLintasOn=!zLintasOn;document.getElementById('z-lintas').classList.toggle('on',zLintasOn);document.getElementById('z-blok-lintas').classList.toggle('hidden',!zLintasOn);if(!zLintasOn){document.getElementById('z-surah-b').value='';document.getElementById('z-ayat-b').value='';document.getElementById('z-surah-b').removeAttribute('required');document.getElementById('z-ayat-b').removeAttribute('required')}else{document.getElementById('z-surah-b').setAttribute('required','true');document.getElementById('z-ayat-b').setAttribute('required','true')}}
   else{mLintasOn=!mLintasOn;document.getElementById('m-lintas').classList.toggle('on',mLintasOn);document.getElementById('m-blok-lintas').classList.toggle('hidden',!mLintasOn);if(!mLintasOn){document.getElementById('m-surah-b').value='';document.getElementById('m-ayat-b').value='';document.getElementById('m-surah-b').removeAttribute('required');document.getElementById('m-ayat-b').removeAttribute('required')}else{document.getElementById('m-surah-b').setAttribute('required','true');document.getElementById('m-ayat-b').setAttribute('required','true')}}
   updateJuz(p);
 }
+function toggleMutqin(p){
+  if(p==='z'){zMutqinOn=!zMutqinOn;document.getElementById('z-mutqin').classList.toggle('on',zMutqinOn);}
+  else{mMutqinOn=!mMutqinOn;document.getElementById('m-mutqin').classList.toggle('on',mMutqinOn);}
+}
 
-// ─── TAB NAV ────────────────────────────────
+// ─── TAB NAV ─────────────────────────────────
 function gotoTab(t){
-  // Reset forms when leaving
   if(currentTab==='ziyadah'&&t!=='ziyadah')resetForm('z');
   if(currentTab==='murajaah'&&t!=='murajaah')resetForm('m');
   currentTab=t;
@@ -771,11 +871,13 @@ function gotoTab(t){
   if(t==='laporan')renderLaporan();
 }
 
-// ─── FORM HELPERS ───────────────────────────
+// ─── FORM HELPERS ────────────────────────────
 function resetForm(p){
-  ['surah-a','ayat-a','juz','catatan'].forEach(f=>document.getElementById(p+'-'+f).value='');
+  ['surah-a','ayat-a','juz','catatan'].forEach(f=>{const el=document.getElementById(p+'-'+f);if(el)el.value=''});
   if(p==='z'&&zLintasOn)toggleLintas('z');
   if(p==='m'&&mLintasOn)toggleLintas('m');
+  if(p==='z'&&zMutqinOn)toggleMutqin('z');
+  if(p==='m'&&mMutqinOn)toggleMutqin('m');
   if(p==='z'){zEditId=null;document.getElementById('z-edit-banner').classList.remove('show');document.getElementById('z-btn-text').textContent='Simpan Ziyadah'}
   if(p==='m'){mEditId=null;document.getElementById('m-edit-banner').classList.remove('show');document.getElementById('m-btn-text').textContent='Simpan Murajaah'}
 }
@@ -791,7 +893,8 @@ function handleSubmit(p,e){
   let surah=document.getElementById(p+'-surah-a').value,ayat=document.getElementById(p+'-ayat-a').value;
   if(isL){const sb=document.getElementById(p+'-surah-b').value,ab=document.getElementById(p+'-ayat-b').value;if(sb)surah+=' — '+sb;if(ab)ayat+=' — '+ab}
   let jenis=p==='z'?'Ziyadah':document.getElementById('m-jenis').value;
-  const entry={tarikh:document.getElementById(p+'-tarikh').value,nama:document.getElementById(p+'-nama').value,jenis,surah,ayat,juz:document.getElementById(p+'-juz').value,gred:document.getElementById(p+'-gred').value,catatan:document.getElementById(p+'-catatan').value};
+  let isMutqin=p==='z'?zMutqinOn:mMutqinOn;
+  const entry={tarikh:document.getElementById(p+'-tarikh').value,nama:document.getElementById(p+'-nama').value,jenis,surah,ayat,juz:document.getElementById(p+'-juz').value,gred:document.getElementById(p+'-gred').value,catatan:document.getElementById(p+'-catatan').value,isMutqin};
   let data=records(),editId=p==='z'?zEditId:mEditId;
   if(editId){const idx=data.findIndex(d=>d.id===editId);if(idx>-1)data[idx]={...data[idx],...entry};Swal.fire({icon:'success',title:'Diperbarui!',timer:900,showConfirmButton:false})}
   else{data.push({...entry,id:uid(),ts:Date.now()});Swal.fire({icon:'success',title:'Tersimpan!',timer:900,showConfirmButton:false})}
@@ -799,46 +902,39 @@ function handleSubmit(p,e){
 }
 document.getElementById('z-form').addEventListener('submit',e=>handleSubmit('z',e));
 document.getElementById('m-form').addEventListener('submit',e=>handleSubmit('m',e));
-['z-form','m-form'].forEach(id=>document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.tagName==='INPUT'){e.preventDefault();e.target.blur()}}));
+['z-form','m-form'].forEach(id=>{const f=document.getElementById(id);if(f)f.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.tagName==='INPUT'){e.preventDefault();e.target.blur()}})});
 
-// ─── PRESENSI ───────────────────────────────
-function getPresensi(date){
-  const p = JSON.parse(localStorage.getItem(PK+date)||'{}');
-  for (let k in p) {
-    if (p[k] === true) p[k] = 'hadir';
-    else if (!['hadir','izin','sakit','alpha'].includes(p[k])) delete p[k];
-  }
-  return p;
-}
+// ─── PRESENSI ────────────────────────────────
+function getPresensi(date){const p=JSON.parse(localStorage.getItem(PK+date)||'{}');for(let k in p){if(p[k]===true)p[k]='hadir';else if(!['hadir','izin','sakit','alpha'].includes(p[k]))delete p[k]}return p}
 function savePresensi(date,data){localStorage.setItem(PK+date,JSON.stringify(data))}
 function updatePresensiItem(nama,val){const d=todayStr(),p=getPresensi(d);if(val)p[nama]=val;else delete p[nama];savePresensi(d,p);renderDashboard()}
 function markAllPresent(){const s=settings();if(!s)return;const d=todayStr(),p=getPresensi(d);getSiswaNames(s).forEach(n=>p[n]='hadir');savePresensi(d,p);renderDashboard()}
 function resetPresensi(){const d=todayStr();savePresensi(d,{});renderDashboard()}
 
-// ─── PROGRESS CALC ──────────────────────────
+// ─── PROGRESS CALC ───────────────────────────
 function calcProgress(nama,s){
   const st=getSiswaObj(s,nama);
-  if(!st)return{current:0,target:0,pct:0,unit:'Juz',noTarget:true};
+  if(!st)return{current:0,target:0,pct:0,unit:'Juz',noTarget:true,targetName:null};
   const recs=records().filter(r=>r.nama===nama&&r.jenis==='Ziyadah');
-  let cur=0,tgt=st.targetHafalan||0,pct=0,m=s.metodeProgress||'juz',unit='Juz';
-  
+  let cur=0,tgt=st.targetHafalan||0,pct=0,m=s.metodeProgress||'juz',unit='Juz',targetName=null;
   if(m==='juz'){
     const jSet=new Set();recs.forEach(r=>{const pts=String(r.juz).split('-').map(Number).filter(n=>!isNaN(n));if(pts.length===2){for(let j=pts[0];j<=pts[1];j++)jSet.add(j)}else if(pts.length===1)jSet.add(pts[0])});
-    cur=st.hafalanAwal+jSet.size;
-  }else{
-    let tAyat=0;recs.forEach(r=>{const pts=r.ayat.match(/\d+/g);if(pts&&pts.length>=2)tAyat+=Math.abs(pts[pts.length-1]-pts[0])+1;else if(pts&&pts.length===1)tAyat+=1});
-    if(m==='lembar'){cur=st.hafalanAwal+Math.floor(tAyat/15);unit='Lembar'}
-    else{cur=st.hafalanAwal+tAyat;if(!tgt)tgt=6236;unit='Ayat'}
+    let idxMulai=parseInt(st.mulaiHafalan),idxAwal=parseInt(st.hafalanAwal),idxTarget=parseInt(st.targetHafalan);
+    if(!isNaN(idxMulai)&&!isNaN(idxTarget)){tgt=Math.abs(idxMulai-idxTarget)+1;let baseCur=0;if(!isNaN(idxAwal))baseCur=Math.abs(idxMulai-idxAwal)+1;cur=baseCur+jSet.size;unit='Juz';targetName="Juz "+idxTarget}
+    else{cur=(parseInt(st.hafalanAwal)||0)+jSet.size;tgt=parseInt(st.targetHafalan)||0}
+  }else if(m==='surah'){
+    const sSet=new Set();recs.forEach(r=>{const parts=r.surah.split(' — ');parts.forEach(p=>sSet.add(p.trim()))});
+    let idxMulai=findSurahIndex(st.mulaiHafalan),idxAwal=findSurahIndex(st.hafalanAwal),idxTarget=findSurahIndex(st.targetHafalan);
+    if(idxMulai!==-1&&idxTarget!==-1){tgt=Math.abs(idxMulai-idxTarget)+1;let baseCur=0;if(idxAwal!==-1)baseCur=Math.abs(idxMulai-idxAwal)+1;cur=baseCur+sSet.size;unit='Surah';targetName=SURAH[idxTarget]}
+    else if(idxAwal!==-1&&idxTarget!==-1){tgt=Math.abs(idxAwal-idxTarget)+1;cur=sSet.size;unit='Surah Baru';targetName=SURAH[idxTarget]}
+    else{cur=sSet.size;tgt=0;unit='Surah'}
   }
-  
-  if(!tgt || tgt===0){
-    return {current:cur,target:0,pct:0,unit,noTarget:true};
-  }
-  pct=Math.min(100,Math.round(cur/tgt*100));
-  return {current:cur,target:tgt,pct,unit,noTarget:false};
+  if(!tgt||tgt===0)return{current:cur,target:0,pct:0,unit,noTarget:true,targetName:null};
+  pct=Math.min(100,Math.round((cur/tgt)*100));
+  return{current:cur,target:tgt,pct,unit,noTarget:false,targetName};
 }
 
-// ─── DASHBOARD ──────────────────────────────
+// ─── DASHBOARD ───────────────────────────────
 function renderDashboard(){
   const s=settings();if(!s)return;
   const allR=records(),today=todayStr(),names=getSiswaNames(s),pres=getPresensi(today);
@@ -847,52 +943,40 @@ function renderDashboard(){
   const setorNames=new Set(todayR.map(r=>r.nama));
   const sudahSetor=hadirNames.filter(n=>setorNames.has(n));
   const belumSetor=hadirNames.filter(n=>!setorNames.has(n));
-
   document.querySelector('[data-testid="stat-total"]').textContent=names.length;
   document.querySelector('[data-testid="stat-hadir"]').textContent=hadirNames.length;
   document.querySelector('[data-testid="stat-sudah"]').textContent=sudahSetor.length;
   document.querySelector('[data-testid="stat-belum"]').textContent=belumSetor.length;
-
-  // Presensi list
   const pl=document.getElementById('presensi-list');
   pl.innerHTML='';
   names.sort().forEach((nm,i)=>{
-    const st=pres[nm]; const sVal=st||'';
+    const st=pres[nm];const sVal=st||'';
     pl.insertAdjacentHTML('beforeend',`<div class="presensi-item ${sVal}" data-testid="presensi-${i}"><div style="display:flex;align-items:center;gap:8px"><div class="avatar" style="width:26px;height:26px;border-radius:7px;font-size:.7rem;flex-shrink:0">${esc(nm).charAt(0).toUpperCase()}</div><span style="font-size:.85rem;font-weight:700;color:var(--ink);word-break:break-word;line-height:1.3">${esc(nm)}</span></div><select class="presensi-select" onchange="updatePresensiItem('${esc(nm).replace(/'/g,"\\'")}', this.value)"><option value="" ${!sVal?'selected':''}>— Status —</option><option value="hadir" ${sVal==='hadir'?'selected':''}>✓ Hadir</option><option value="izin" ${sVal==='izin'?'selected':''}>📋 Izin</option><option value="sakit" ${sVal==='sakit'?'selected':''}>🤒 Sakit</option><option value="alpha" ${sVal==='alpha'?'selected':''}>✗ Alpha</option></select></div>`);
   });
-
-  // Weekly chart
   renderWeeklyChart(allR);
-
-  // Progress
   const progDiv=document.getElementById('dash-progress');
   if(!names.length){progDiv.innerHTML='<p class="text-sm" style="color:var(--ink-soft)">Belum ada siswa.</p>'}
   else{let h='';names.sort().forEach(nm=>{const p=calcProgress(nm,s),cls=p.pct<30?'low':p.pct<70?'gold':'';
-    const progBar = p.noTarget ? '<span style="color:var(--ink-faint);font-size:0.75rem;font-weight:700">Target belum diset</span>' : `<div class="progress-wrap"><div class="progress-fill ${cls}" style="width:${p.pct}%"></div></div>`;
-    const valStr = p.noTarget ? '' : `/${p.target} ${p.unit} (${p.pct}%)`;
+    const progBar=p.noTarget?'<span style="color:var(--ink-faint);font-size:0.75rem;font-weight:700">Target belum diset</span>':`<div class="progress-wrap"><div class="progress-fill ${cls}" style="width:${p.pct}%"></div></div>`;
+    const valStr=p.noTarget?'':(p.targetName?`/${p.targetName} (${p.pct}%)`:`/${p.target} ${p.unit} (${p.pct}%)`);
     h+=`<div class="flex items-center gap-3"><div class="avatar" style="width:30px;height:30px;border-radius:8px;font-size:.75rem">${esc(nm).charAt(0).toUpperCase()}</div><div class="flex-1 min-w-0"><div class="flex justify-between items-center mb-1"><span class="text-sm font-semibold truncate" style="color:var(--ink)">${esc(nm)}</span><span class="text-xs font-bold" style="color:var(--teal)">${p.current}${valStr}</span></div>${progBar}</div></div>`});
     progDiv.innerHTML=h}
-
-  // Recent
   const recDiv=document.getElementById('dash-recent');
   const recent=[...allR].sort((a,b)=>(b.ts||0)-(a.ts||0)).slice(0,8);
   if(!recent.length){recDiv.innerHTML='<p class="text-sm" style="color:var(--ink-soft)">Belum ada setoran.</p>'}
-  else{let h='';recent.forEach(r=>{h+=`<div class="flex items-center gap-3 py-2" style="border-bottom:1px solid var(--border)"><div class="avatar" style="width:28px;height:28px;border-radius:8px;font-size:.7rem">${esc(r.nama).charAt(0).toUpperCase()}</div><div class="flex-1 min-w-0"><p class="text-sm font-semibold truncate" style="color:var(--ink)">${esc(r.nama)} <span style="color:var(--ink-soft);font-weight:400">— ${esc(r.surah)}</span></p><p class="text-xs" style="color:var(--ink-soft)">${esc(r.jenis)} · ${relativeTime(r.ts||Date.now())}</p></div><span class="${badgeCls(r.gred)}">${esc(r.gred)}</span></div>`});recDiv.innerHTML=h}
-
-  // Attention: no setor >3 days or progress <30%
+  else{let h='';recent.forEach(r=>{const starIco=r.isMutqin?'<i class="ph-fill ph-star" style="color:var(--gold); margin-left:4px" title="Mutqin"></i>':'';h+=`<div class="flex items-center gap-3 py-2" style="border-bottom:1px solid var(--border)"><div class="avatar" style="width:28px;height:28px;border-radius:8px;font-size:.7rem">${esc(r.nama).charAt(0).toUpperCase()}</div><div class="flex-1 min-w-0"><p class="text-sm font-semibold truncate" style="color:var(--ink)">${esc(r.nama)} <span style="color:var(--ink-soft);font-weight:400">— ${esc(r.surah)}</span></p><p class="text-xs" style="color:var(--ink-soft)">${esc(r.jenis)} · ${relativeTime(r.ts||Date.now())}</p></div><span class="${badgeCls(r.gred)} flex items-center">${esc(r.gred)}${starIco}</span></div>`});recDiv.innerHTML=h}
   const attDiv=document.getElementById('dash-attention');
   const threeDaysAgo=new Date();threeDaysAgo.setDate(threeDaysAgo.getDate()-3);const threeStr=threeDaysAgo.toISOString().split('T')[0];
   const attention=names.filter(nm=>{const recs=allR.filter(r=>r.nama===nm);if(!recs.some(r=>r.tarikh>=threeStr))return true;const p=calcProgress(nm,s);return !p.noTarget&&p.pct<30});
   if(!attention.length){attDiv.innerHTML='<p class="text-sm" style="color:var(--ink-soft)">Semua siswa dalam performa baik!</p>'}
-  else{let h='';attention.forEach(nm=>{
-    const p=calcProgress(nm,s),last=allR.filter(r=>r.nama===nm).sort((a,b)=>(b.ts||0)-(a.ts||0))[0],lastD=last?relativeTime(last.ts||Date.now()):'Belum pernah setor';
-    const progBar = p.noTarget ? '<span style="color:var(--ink-faint);font-size:0.75rem;font-weight:700;display:block;margin-top:4px">Target belum diset</span>' : `<div class="progress-wrap mt-1"><div class="progress-fill low" style="width:${p.pct}%"></div></div>`;
-    const pctText = p.noTarget ? '' : ` · ${p.pct}%`;
+  else{let h='';attention.forEach(nm=>{const p=calcProgress(nm,s),last=allR.filter(r=>r.nama===nm).sort((a,b)=>(b.ts||0)-(a.ts||0))[0],lastD=last?relativeTime(last.ts||Date.now()):'Belum pernah setor';
+    const progBar=p.noTarget?'<span style="color:var(--ink-faint);font-size:0.75rem;font-weight:700;display:block;margin-top:4px">Target belum diset</span>':`<div class="progress-wrap mt-1"><div class="progress-fill low" style="width:${p.pct}%"></div></div>`;
+    const pctText=p.noTarget?'':` · ${p.pct}%`;
     h+=`<div class="flex items-center gap-3 p-3 rounded-xl" style="background:linear-gradient(135deg,#fef2f2,#fecaca);border:1px solid #fca5a5"><div class="avatar" style="width:30px;height:30px;border-radius:8px;font-size:.75rem;background:linear-gradient(135deg,var(--danger),#991b1b)">${esc(nm).charAt(0).toUpperCase()}</div><div class="flex-1 min-w-0"><p class="text-sm font-semibold truncate" style="color:var(--ink)">${esc(nm)}</p><p class="text-xs" style="color:var(--ink-soft)">Terakhir: ${lastD}${pctText}</p>${progBar}</div></div>`});
     attDiv.innerHTML=h}
 }
 
-// ─── WEEKLY CHART ───────────────────────────
+// ─── WEEKLY CHART ────────────────────────────
 function renderWeeklyChart(allR){
   const canvas=document.getElementById('chart-weekly');if(!canvas||typeof Chart==='undefined')return;
   if(weeklyChart){weeklyChart.destroy();weeklyChart=null}
@@ -904,7 +988,7 @@ function renderWeeklyChart(allR){
   weeklyChart=new Chart(canvas,{type:'bar',data:{labels,datasets:[{label:'Ziyadah',data:zy,backgroundColor:dk?'#5cc7c7':'#1a5c5c',borderRadius:6},{label:'Murajaah',data:mr,backgroundColor:dk?'#e2be61':'#b8922a',borderRadius:6}]},options:{responsive:true,plugins:{legend:{labels:{color:dk?'#b3a99b':'#4a3f35',font:{family:'Nunito'}}}},scales:{y:{beginAtZero:true,ticks:{stepSize:1,color:dk?'#b3a99b':'#8c7d6e'},grid:{color:dk?'#293d3d':'#e8dfd0'}},x:{ticks:{color:dk?'#b3a99b':'#8c7d6e'},grid:{display:false}}}}});
 }
 
-// ─── LAPORAN ────────────────────────────────
+// ─── LAPORAN ─────────────────────────────────
 function renderLaporan(){
   const s=settings(),allR=records();
   const container=document.getElementById('laporan-cards'),insightDiv=document.getElementById('laporan-insight'),empty=document.getElementById('laporan-empty');
@@ -912,61 +996,46 @@ function renderLaporan(){
   if(!s||!getSiswaNames(s).length){empty.classList.remove('hidden');return}
   empty.classList.add('hidden');
   const names=[...getSiswaNames(s)].sort();
-
-  // Render cards
   names.forEach((nm,i)=>{
     const recs=allR.filter(r=>r.nama===nm).sort((a,b)=>(b.ts||0)-(a.ts||0));
     const count=recs.length,p=calcProgress(nm,s);
     const lastRec=recs[0],lastDate=lastRec?fmtDate(lastRec.tarikh):'—',lastGrade=lastRec?lastRec.gred:'';
     const ab=getAvatarBg(nm),ini=getInitials(nm);
     const cls=p.pct<30?'low':p.pct<70?'gold':'';
-    
-    const progVal = p.noTarget ? '—' : p.pct+'%';
-    const progBar = p.noTarget ? '<div class="mt-2 text-center"><span style="color:var(--ink-faint);font-size:0.75rem;font-weight:700">Target belum diset</span></div>' : `<div class="progress-wrap mt-2"><div class="progress-fill ${cls}" style="width:${p.pct}%"></div></div>`;
-
+    const progVal=p.noTarget?'—':p.pct+'%';
+    const progBar=p.noTarget?'<div class="mt-2 text-center"><span style="color:var(--ink-faint);font-size:0.75rem;font-weight:700">Target belum diset</span></div>':`<div class="progress-wrap mt-2"><div class="progress-fill ${cls}" style="width:${p.pct}%"></div></div>`;
     const div=document.createElement('div');div.className='laporan-card fade-up';div.style.animationDelay=(i*40)+'ms';div.style.animationFillMode='both';
-    div.onclick=()=>openModal(nm);
-    div.setAttribute('data-testid','laporan-card-'+i);
+    div.onclick=()=>openModal(nm);div.setAttribute('data-testid','laporan-card-'+i);
     div.innerHTML=`<div class="flex justify-between items-start"><div class="avatar-lg" style="background:${ab[0]};color:${ab[1]}">${ini}</div>${lastGrade?`<span class="${badgeCls(lastGrade)}">${esc(lastGrade)}</span>`:''}</div><h4 class="font-bold mt-3 truncate" style="color:var(--ink);font-size:.95rem">${esc(nm)}</h4><p class="text-xs mt-0.5 flex items-center gap-1" style="color:var(--ink-soft)"><i class="ph-bold ph-clock text-xs"></i> Update: ${esc(lastDate)}</p><div class="flex gap-2 mt-3"><div class="stat-mini"><span class="stat-mini-label">Setoran</span><span class="stat-mini-value">${count}</span></div><div class="stat-mini"><span class="stat-mini-label">Progress</span><span class="stat-mini-value" style="color:var(--teal)">${progVal}</span></div></div>${progBar}`;
     container.appendChild(div);
   });
-
-  // Insight section
   const now=new Date(),monthStr=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
   const monthRecs=allR.filter(r=>r.tarikh&&r.tarikh.startsWith(monthStr));
   const totalSetoran=monthRecs.length;
   const juzSet=new Set();monthRecs.forEach(r=>{const pts=String(r.juz).split('-').map(Number).filter(n=>!isNaN(n));if(pts.length===2){for(let j=pts[0];j<=pts[1];j++)juzSet.add(j)}else if(pts.length===1)juzSet.add(pts[0])});
   const grades={};monthRecs.forEach(r=>{grades[r.gred]=(grades[r.gred]||0)+1});
   const topGrade=Object.entries(grades).sort((a,b)=>b[1]-a[1])[0]?.[0]||'—';
-  
-  let totalPct=0, validNames=0;
-  names.forEach(nm=>{
-    const p = calcProgress(nm,s);
-    if(!p.noTarget) { totalPct+=p.pct; validNames++; }
-  });
+  let totalPct=0,validNames=0;
+  names.forEach(nm=>{const p=calcProgress(nm,s);if(!p.noTarget){totalPct+=p.pct;validNames++}});
   const avgPct=validNames?Math.round(totalPct/validNames):0;
   const onTrack=names.filter(nm=>{const p=calcProgress(nm,s);return !p.noTarget&&p.pct>=50}).length;
   const statusLabel=avgPct>=80?'Target Terlampaui':avgPct>=50?'Dalam Jalur':'Perlu Perhatian';
   const statusColor=avgPct>=80?'#86efac':avgPct>=50?'#fde68a':'#fca5a5';
   const curMonth=MONTHS[now.getMonth()]+' '+now.getFullYear();
-
   insightDiv.innerHTML=`<div class="insight-card"><span class="insight-badge">INSIGHT BULANAN</span><div class="flex flex-col sm:flex-row gap-5 mt-4"><div class="flex-1"><h2 class="font-display text-xl sm:text-2xl font-bold text-white leading-tight">Evaluasi Capaian<br>${esc(s.halaqah)}</h2><p class="text-sm mt-3" style="color:rgba(255,255,255,.7)">Rata-rata hafalan santri bulan ini: ${avgPct}%. ${onTrack} dari ${names.length} santri mencapai target mutaba'ah secara konsisten.</p><div class="flex gap-6 mt-5"><div><span class="text-2xl font-bold text-white">${totalSetoran}</span><br><span class="text-xs" style="color:rgba(255,255,255,.5)">TOTAL SETORAN</span></div><div><span class="text-2xl font-bold text-white">${juzSet.size}</span><br><span class="text-xs" style="color:rgba(255,255,255,.5)">SELESAI JUZ</span></div><div><span class="text-2xl font-bold" style="color:var(--gold)">${esc(topGrade)}</span><br><span class="text-xs" style="color:rgba(255,255,255,.5)">PREDIKAT GRUP</span></div></div></div><div class="insight-progress-box" style="min-width:130px"><span class="text-3xl font-bold" style="color:${statusColor}">${avgPct}%</span><span class="text-sm font-bold text-white">${statusLabel}</span><span class="text-xs" style="color:rgba(255,255,255,.5)">${curMonth.toUpperCase()}</span></div></div></div>`;
 }
 
-// ─── MODAL ──────────────────────────────────
+// ─── MODAL ───────────────────────────────────
 function openModal(nm){
   modalStudent=nm;modalLimit=10;const s=settings(),allR=records().filter(r=>r.nama===nm).sort((a,b)=>(b.ts||0)-(a.ts||0));
   const ab=getAvatarBg(nm);
   document.getElementById('modal-nama').textContent=nm;
   document.getElementById('modal-count').textContent=allR.length+' Setoran';
   const av=document.getElementById('modal-avatar');av.textContent=getInitials(nm);av.style.background=ab[0];av.style.color=ab[1];
-
   const p=calcProgress(nm,s);
-  const progBar = p.noTarget ? '<span style="color:var(--ink-faint);font-size:0.85rem;font-weight:700;display:block;margin-top:4px">Target belum diset</span>' : `<div class="progress-wrap" style="height:12px"><div class="progress-fill ${p.pct<30?'low':p.pct<70?'gold':''}" style="width:${p.pct}%"></div></div>`;
-  const valStr = p.noTarget ? '' : `/${p.target} ${p.unit} (${p.pct}%)`;
+  const progBar=p.noTarget?'<span style="color:var(--ink-faint);font-size:0.85rem;font-weight:700;display:block;margin-top:4px">Target belum diset</span>':`<div class="progress-wrap" style="height:12px"><div class="progress-fill ${p.pct<30?'low':p.pct<70?'gold':''}" style="width:${p.pct}%"></div></div>`;
+  const valStr=p.noTarget?'':(p.targetName?`/${p.targetName} (${p.pct}%)`:`/${p.target} ${p.unit} (${p.pct}%)`);
   document.getElementById('modal-progress-wrap').innerHTML=`<div class="mb-3"><div class="flex justify-between mb-1"><span class="text-sm font-semibold" style="color:var(--ink)">Progress Hafalan</span><span class="text-sm font-bold" style="color:var(--teal)">${p.current}${valStr}</span></div>${progBar}</div>`;
-
-  // Chart
   const canvas=document.getElementById('modal-chart');
   if(modalChart){modalChart.destroy();modalChart=null}
   if(typeof Chart!=='undefined'){
@@ -977,48 +1046,40 @@ function openModal(nm){
     const dk=document.documentElement.classList.contains('dark');
     modalChart=new Chart(canvas,{type:'bar',data:{labels,datasets:[{data,backgroundColor:dk?['#5cc7c7','#e2be61','#4cbdbd','#b3a99b','#8a7f72']:['#1a5c5c','#b8922a','#257070','#8c7d6e','#c4b8a8'],borderRadius:8,barThickness:32}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{stepSize:1,color:dk?'#b3a99b':'#8c7d6e'},grid:{color:dk?'#293d3d':'#e8dfd0'}},y:{ticks:{color:dk?'#b3a99b':'#8c7d6e'},grid:{display:false}}}}});
   }
-
   renderModalHistory();
   show('modal-overlay');
 }
 function renderModalHistory(){
-  const nm=modalStudent, allR=records().filter(r=>r.nama===nm).sort((a,b)=>(b.ts||0)-(a.ts||0));
+  const nm=modalStudent,allR=records().filter(r=>r.nama===nm).sort((a,b)=>(b.ts||0)-(a.ts||0));
   const histDiv=document.getElementById('modal-history');histDiv.innerHTML='';
   const shown=allR.slice(0,modalLimit);
   if(!shown.length){histDiv.innerHTML='<div class="text-center py-8"><i class="ph-duotone ph-folder-dashed text-4xl" style="color:var(--ink-faint)"></i><p class="mt-2 text-sm" style="color:var(--ink-soft)">Belum ada riwayat.</p></div>'}
   else{
-    shown.forEach(h=>{histDiv.insertAdjacentHTML('beforeend',`<div class="history-item"><div class="flex items-start justify-between gap-2"><div class="flex-1 min-w-0 pl-3"><p class="font-semibold text-sm" style="color:var(--ink)">${esc(h.surah)}</p><p class="text-xs mt-0.5" style="color:var(--ink-soft)">Ayat ${esc(h.ayat)} · Juz ${esc(h.juz)}</p></div><div class="flex items-center gap-2 flex-shrink-0"><span class="${badgeCls(h.gred)}">${esc(h.gred)}</span><button data-action="edit" data-id="${esc(h.id)}" style="color:var(--ink-soft);background:none;border:none;cursor:pointer;font-size:1rem;padding:2px"><i class="ph-bold ph-pencil-simple"></i></button><button data-action="delete" data-id="${esc(h.id)}" data-nama="${esc(nm)}" style="color:var(--ink-soft);background:none;border:none;cursor:pointer;font-size:1rem;padding:2px"><i class="ph-bold ph-trash"></i></button></div></div><div class="flex items-center justify-between mt-2 pl-3"><span class="text-xs font-bold" style="color:var(--teal)">${esc(h.jenis)}</span><span class="text-xs" style="color:var(--ink-faint)">${relativeTime(h.ts||Date.now())}</span></div>${h.catatan?`<p class="text-xs mt-2 pl-3 pt-2" style="color:var(--ink-soft);border-top:1px dashed var(--border)">${esc(h.catatan)}</p>`:''}</div>`)});
+    shown.forEach(h=>{
+      const starIco=h.isMutqin?'<i class="ph-fill ph-star text-base" style="color:var(--gold); margin-left:4px" title="Mutqin"></i>':'';
+      histDiv.insertAdjacentHTML('beforeend',`<div class="history-item"><div class="flex items-start justify-between gap-2"><div class="flex-1 min-w-0 pl-3"><p class="font-semibold text-sm flex items-center" style="color:var(--ink)">${esc(h.surah)} ${starIco}</p><p class="text-xs mt-0.5" style="color:var(--ink-soft)">Ayat ${esc(h.ayat)} · Juz ${esc(h.juz)}</p></div><div class="flex items-center gap-2 flex-shrink-0"><span class="${badgeCls(h.gred)}">${esc(h.gred)}</span><button data-action="edit" data-id="${esc(h.id)}" style="color:var(--ink-soft);background:none;border:none;cursor:pointer;font-size:1rem;padding:2px"><i class="ph-bold ph-pencil-simple"></i></button><button data-action="delete" data-id="${esc(h.id)}" data-nama="${esc(nm)}" style="color:var(--ink-soft);background:none;border:none;cursor:pointer;font-size:1rem;padding:2px"><i class="ph-bold ph-trash"></i></button></div></div><div class="flex items-center justify-between mt-2 pl-3"><span class="text-xs font-bold" style="color:var(--teal)">${esc(h.jenis)}</span><span class="text-xs" style="color:var(--ink-faint)">${relativeTime(h.ts||Date.now())}</span></div>${h.catatan?`<p class="text-xs mt-2 pl-3 pt-2" style="color:var(--ink-soft);border-top:1px dashed var(--border)">${esc(h.catatan)}</p>`:''}</div>`)
+    });
     if(allR.length>modalLimit){histDiv.insertAdjacentHTML('beforeend',`<button onclick="modalLimit+=10;renderModalHistory()" class="btn-ghost btn-sm" style="width:100%;margin-top:12px"><i class="ph-bold ph-caret-down"></i> Muat Lebih Banyak</button>`)}
   }
 }
 document.getElementById('modal-history').addEventListener('click',function(e){const btn=e.target.closest('button[data-action]');if(!btn)return;if(btn.dataset.action==='edit')doEdit(btn.dataset.id);else if(btn.dataset.action==='delete')doDelete(btn.dataset.id,btn.dataset.nama)});
 function closeModal(){hide('modal-overlay');modalStudent=''}
 
-// ─── EDIT ───────────────────────────────────
+// ─── EDIT ────────────────────────────────────
 function doEdit(id){
   const d=records().find(r=>r.id===id);if(!d)return;
-  
-  let mappedJenis = d.jenis;
-  if (mappedJenis === 'Sabqi' || mappedJenis === "Muraja'ah") mappedJenis = 'Murajaah Fardi';
-  
+  let mappedJenis=d.jenis;
+  if(mappedJenis==='Sabqi'||mappedJenis==="Muraja'ah")mappedJenis='Murajaah Fardi';
   const isZ=mappedJenis==='Ziyadah';const p=isZ?'z':'m';
   if(isZ){zEditId=id;gotoTab('ziyadah')}else{mEditId=id;gotoTab('murajaah')}
-  
   document.getElementById(p+'-tarikh').value=d.tarikh;
   document.getElementById(p+'-nama').value=d.nama;
-  
-  if(!isZ){
-    const mJenisSel = document.getElementById('m-jenis');
-    if (mJenisSel) {
-      let optExists = Array.from(mJenisSel.options).some(opt => opt.value === mappedJenis);
-      if (!optExists) mappedJenis = 'Murajaah Fardi';
-      mJenisSel.value = mappedJenis;
-    }
-  }
-  
+  if(!isZ){const mJenisSel=document.getElementById('m-jenis');if(mJenisSel){let optExists=Array.from(mJenisSel.options).some(opt=>opt.value===mappedJenis);if(!optExists)mappedJenis='Murajaah Fardi';mJenisSel.value=mappedJenis}}
   document.getElementById(p+'-juz').value=d.juz;
   document.getElementById(p+'-gred').value=d.gred;
   document.getElementById(p+'-catatan').value=d.catatan||'';
+  if(d.isMutqin){if(isZ&&!zMutqinOn)toggleMutqin('z');else if(!isZ&&!mMutqinOn)toggleMutqin('m')}
+  else{if(isZ&&zMutqinOn)toggleMutqin('z');else if(!isZ&&mMutqinOn)toggleMutqin('m')}
   const sp=d.surah.split(' — '),ap=d.ayat.split(' — ');
   document.getElementById(p+'-surah-a').value=sp[0]||'';document.getElementById(p+'-ayat-a').value=ap[0]||'';
   if(sp[1]){const isL=p==='z'?zLintasOn:mLintasOn;if(!isL)toggleLintas(p);document.getElementById(p+'-surah-b').value=sp[1];document.getElementById(p+'-ayat-b').value=ap[1]||''}
@@ -1027,12 +1088,12 @@ function doEdit(id){
   closeModal();window.scrollTo({top:0,behavior:'smooth'});
 }
 
-// ─── DELETE ─────────────────────────────────
+// ─── DELETE ──────────────────────────────────
 function doDelete(id,nm){Swal.fire({title:'Hapus Setoran?',icon:'warning',showCancelButton:true,confirmButtonColor:'#dc2626',confirmButtonText:'Ya, Hapus',cancelButtonText:'Batal'}).then(r=>{if(!r.isConfirmed)return;saveRecs(records().filter(d=>d.id!==id));openModal(nm);Swal.mixin({toast:true,position:'top-end',showConfirmButton:false,timer:1500}).fire({icon:'success',title:'Terhapus!'})})}
 
-// ─── DATE PRESETS ───────────────────────────
+// ─── DATE PRESETS ────────────────────────────
 function promptDateRange(cb){
-  let start=null, end=null;
+  let start=null,end=null;
   Swal.fire({
     title:'<span style="font-family:Playfair Display,serif;font-size:1.1rem">Pilih Rentang Waktu</span>',
     html:`<div style="display:flex;flex-direction:column;gap:10px;width:100%;padding:0 4px">
@@ -1047,112 +1108,98 @@ function promptDateRange(cb){
       </div>
       <button type="button" id="swal-custom-go" style="background:#1a5c5c;color:#ffffff;font-weight:700;border-radius:12px;padding:12px;font-size:.9rem;width:100%;border:none;cursor:pointer;font-family:'Nunito',sans-serif;margin-top:4px;display:none;">Terapkan</button>
     </div>`,
-    showConfirmButton:false,
-    showCancelButton:true,
-    cancelButtonText:'Batal',
+    showConfirmButton:false,showCancelButton:true,cancelButtonText:'Batal',
     didOpen:()=>{
       const now=new Date();
-      document.getElementById('btn-preset-today').onclick=()=>{
-        start=new Date(now); start.setHours(0,0,0,0);
-        end=new Date(now); end.setHours(23,59,59,999);
-        Swal.close(); cb(start,end);
-      };
-      document.getElementById('btn-preset-week').onclick=()=>{
-        end=new Date(now); end.setHours(23,59,59,999);
-        start=new Date(now); start.setDate(start.getDate()-6); start.setHours(0,0,0,0);
-        Swal.close(); cb(start,end);
-      };
-      document.getElementById('btn-preset-month').onclick=()=>{
-        start=new Date(now.getFullYear(),now.getMonth(),1,0,0,0,0);
-        end=new Date(now.getFullYear(),now.getMonth()+1,0,23,59,59,999);
-        Swal.close(); cb(start,end);
-      };
-      document.getElementById('btn-preset-semester').onclick=()=>{
-        start=new Date(now.getFullYear(),now.getMonth()-5,1,0,0,0,0);
-        end=new Date(now.getFullYear(),now.getMonth()+1,0,23,59,59,999);
-        Swal.close(); cb(start,end);
-      };
-      document.getElementById('btn-preset-all').onclick=()=>{
-        Swal.close(); cb(null,null);
-      };
-      document.getElementById('btn-preset-custom').onclick=(e)=>{
-        e.target.style.display='none'; document.getElementById('swal-custom-wrap').style.display='flex';
-      };
+      document.getElementById('btn-preset-today').onclick=()=>{start=new Date(now);start.setHours(0,0,0,0);end=new Date(now);end.setHours(23,59,59,999);Swal.close();cb(start,end)};
+      document.getElementById('btn-preset-week').onclick=()=>{end=new Date(now);end.setHours(23,59,59,999);start=new Date(now);start.setDate(start.getDate()-6);start.setHours(0,0,0,0);Swal.close();cb(start,end)};
+      document.getElementById('btn-preset-month').onclick=()=>{start=new Date(now.getFullYear(),now.getMonth(),1,0,0,0,0);end=new Date(now.getFullYear(),now.getMonth()+1,0,23,59,59,999);Swal.close();cb(start,end)};
+      document.getElementById('btn-preset-semester').onclick=()=>{start=new Date(now.getFullYear(),now.getMonth()-5,1,0,0,0,0);end=new Date(now.getFullYear(),now.getMonth()+1,0,23,59,59,999);Swal.close();cb(start,end)};
+      document.getElementById('btn-preset-all').onclick=()=>{Swal.close();cb(null,null)};
+      document.getElementById('btn-preset-custom').onclick=(e)=>{e.target.style.display='none';document.getElementById('swal-custom-wrap').style.display='flex'};
       const sI=document.getElementById('swal-start'),eI=document.getElementById('swal-end'),gB=document.getElementById('swal-custom-go');
-      const chk=()=>{ if(sI.value&&eI.value) gB.style.display='block'; else gB.style.display='none'; };
-      sI.addEventListener('input',chk); eI.addEventListener('input',chk);
-      gB.onclick=()=>{
-        start=new Date(sI.value); start.setHours(0,0,0,0);
-        end=new Date(eI.value); end.setHours(23,59,59,999);
-        Swal.close(); cb(start,end);
-      };
+      const chk=()=>{if(sI.value&&eI.value)gB.style.display='block';else gB.style.display='none'};
+      sI.addEventListener('input',chk);eI.addEventListener('input',chk);
+      gB.onclick=()=>{start=new Date(sI.value);start.setHours(0,0,0,0);end=new Date(eI.value);end.setHours(23,59,59,999);Swal.close();cb(start,end)};
     }
   });
 }
 function getPeriodeText(s,e){if(!s||!e)return"Semua Waktu";return`${fmtDate(s.toISOString().split('T')[0])} — ${fmtDate(e.toISOString().split('T')[0])}`}
 
-// ─── PDF ────────────────────────────────────
+// ─── PDF ─────────────────────────────────────
 function makePDF(elId,fn){Swal.fire({title:'Menyiapkan PDF...',allowOutsideClick:false,didOpen:()=>Swal.showLoading()});const el=document.getElementById(elId);el.style.position='static';el.style.left='';html2pdf().set({margin:12,filename:fn,image:{type:'jpeg',quality:.98},html2canvas:{scale:2,useCORS:true},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}}).from(el).save().then(()=>{el.style.position='absolute';el.style.left='-9999px';Swal.close()}).catch(()=>{el.style.position='absolute';el.style.left='-9999px';Swal.fire({icon:'error',title:'Error',text:'PDF gagal dibuat.'})})}
 function exportGlobalPDF(sR,eR){let d=records();if(sR&&eR)d=d.filter(r=>{const td=new Date(r.tarikh+'T00:00:00');return td>=sR&&td<=eR});if(!d.length)return Swal.fire('Kosong','Tidak ada data.','info');const s=settings(),lb=getLabel(s);document.getElementById('pg-halaqah').textContent=s.halaqah;document.getElementById('pg-musyrif-label').textContent=lb+':';document.getElementById('pg-musyrif').textContent=s.guru;document.getElementById('pg-periode').textContent=getPeriodeText(sR,eR);const tb=document.getElementById('pg-body');tb.innerHTML='';d.sort((a,b)=>(a.ts||0)-(b.ts||0)).forEach(r=>{tb.insertAdjacentHTML('beforeend',`<tr><td>${esc(fmtDate(r.tarikh))}</td><td><strong>${esc(r.nama)}</strong></td><td>${esc(r.jenis)}</td><td>${esc(r.surah)} (${esc(r.ayat)})</td><td>${esc(r.juz)}</td><td>${esc(r.gred)}</td><td>${esc(r.catatan||'—')}</td></tr>`)});makePDF('pdf-global',`Rekap_${s.halaqah.replace(/\s/g,'_')}.pdf`)}
 function exportPDFDirect(nm,sR,eR){let d=records().filter(r=>r.nama===nm).sort((a,b)=>(a.ts||0)-(b.ts||0));if(sR&&eR)d=d.filter(r=>{const td=new Date(r.tarikh+'T00:00:00');return td>=sR&&td<=eR});if(!d.length)return Swal.fire('Kosong','Tidak ada setoran.','info');const s=settings(),lb=getLabel(s);document.getElementById('pp-nama').textContent=nm;document.getElementById('pp-halaqah').textContent=s.halaqah;document.getElementById('pp-musyrif-label').textContent=lb;document.getElementById('pp-musyrif').textContent=s.guru;document.getElementById('pp-ttd').textContent=s.guru;document.getElementById('pp-sign-label').textContent=`Mengetahui, ${lb}`;document.getElementById('pp-periode').textContent=getPeriodeText(sR,eR);const tb=document.getElementById('pp-body');tb.innerHTML='';d.forEach(r=>{tb.insertAdjacentHTML('beforeend',`<tr><td>${esc(fmtDate(r.tarikh))}</td><td>${esc(r.jenis)}</td><td><strong>${esc(r.surah)}</strong> (${esc(r.ayat)})</td><td>${esc(r.juz)}</td><td><strong>${esc(r.gred)}</strong></td><td>${esc(r.catatan||'—')}</td></tr>`)});makePDF('pdf-personal',`Rapor_${nm.replace(/\s/g,'_')}.pdf`)}
 function exportPDFFromModal(){const nm=modalStudent;closeModal();promptDateRange((s,e)=>exportPDFDirect(nm,s,e))}
 function mainExportPDF(){promptDateRange((s,e)=>exportGlobalPDF(s,e))}
 
-// ─── CSV EXPORT ─────────────────────────────
+// ─── CSV ─────────────────────────────────────
 function exportCSV(){
-  promptDateRange((sR, eR) => {
+  promptDateRange((sR,eR)=>{
     let d=records().sort((a,b)=>(a.ts||0)-(b.ts||0));
-    if(sR && eR){
-      d = d.filter(r => { const td = new Date(r.tarikh+'T00:00:00'); return td>=sR && td<=eR; });
-    }
+    if(sR&&eR)d=d.filter(r=>{const td=new Date(r.tarikh+'T00:00:00');return td>=sR&&td<=eR});
     if(!d.length)return Swal.fire('Kosong','Tidak ada data pada rentang waktu ini.','info');
-    
-    const s=settings();
-    let csv="Tanggal,Nama,Jenis,Surah,Ayat,Juz,Nilai,Catatan\n";
-    d.forEach(r=>{
-      const c=(r.catatan||'').replace(/"/g,'""');
-      csv+=`${r.tarikh},"${r.nama}",${r.jenis},"${r.surah}","${r.ayat}",${r.juz},${r.gred},"${c}"\n`;
-    });
-    
-    let periodStr = "Semua_Waktu";
-    if(sR && eR) periodStr = `${sR.toISOString().split('T')[0]}_sd_${eR.toISOString().split('T')[0]}`;
-    
-    const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement("a");
-    a.setAttribute("href",url);
-    a.setAttribute("download",`Data_Setoran_${s.halaqah.replace(/\s/g,'_')}_${periodStr}.csv`);
-    document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+    const s=settings();let csv="Tanggal,Nama,Jenis,Surah,Ayat,Juz,Nilai,Catatan\n";
+    d.forEach(r=>{const c=(r.catatan||'').replace(/"/g,'""');csv+=`${r.tarikh},"${r.nama}",${r.jenis},"${r.surah}","${r.ayat}",${r.juz},${r.gred},"${c}"\n`});
+    let periodStr="Semua_Waktu";if(sR&&eR)periodStr=`${sR.toISOString().split('T')[0]}_sd_${eR.toISOString().split('T')[0]}`;
+    const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.setAttribute("href",url);a.setAttribute("download",`Data_Setoran_${s.halaqah.replace(/\s/g,'_')}_${periodStr}.csv`);document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
   });
 }
 function exportPresensiCSV(){
-  const s=settings();if(!s)return;
-  let csv="Tanggal,Nama,Status\n";
+  const s=settings();if(!s)return;let csv="Tanggal,Nama,Status\n";
   const keys=Object.keys(localStorage).filter(k=>k.startsWith(PK)).sort();
   if(!keys.length)return Swal.fire('Kosong','Tidak ada data presensi.','info');
-  keys.forEach(k=>{
-    const date=k.replace(PK,''), data=getPresensi(date);
-    Object.entries(data).forEach(([nm,st])=>{
-      const sVal=st?st.charAt(0).toUpperCase()+st.slice(1):'';
-      csv+=`${date},"${nm}",${sVal}\n`;
-    });
-  });
-  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement("a");
-  a.setAttribute("href",url);
-  a.setAttribute("download",`Data_Presensi_${s.halaqah.replace(/\s/g,'_')}.csv`);
-  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+  keys.forEach(k=>{const date=k.replace(PK,''),data=getPresensi(date);Object.entries(data).forEach(([nm,st])=>{const sVal=st?st.charAt(0).toUpperCase()+st.slice(1):'';csv+=`${date},"${nm}",${sVal}\n`})});
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.setAttribute("href",url);a.setAttribute("download",`Data_Presensi_${s.halaqah.replace(/\s/g,'_')}.csv`);document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
 }
 
-// ─── BACKUP / IMPORT ────────────────────────
+// ─── BACKUP / IMPORT ─────────────────────────
 function doBackupJSON(){const s=settings(),d=records(),pres={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k.startsWith(PK))pres[k.replace(PK,'')]=JSON.parse(localStorage.getItem(k))}const fn='Backup_'+s.halaqah.replace(/\s+/g,'_')+'.json';const blob=new Blob([JSON.stringify({settings:s,records:d,presensi:pres},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=fn;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);Swal.mixin({toast:true,position:'top-end',showConfirmButton:false,timer:2000}).fire({icon:'success',title:'Backup berhasil!'})}
 function doImport(e){const file=e.target.files[0];if(!file)return;const rd=new FileReader();rd.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(d.settings){const m=migrate(d.settings);saveSets(m)}if(d.records)saveRecs(d.records);if(d.presensi)Object.entries(d.presensi).forEach(([dt,data])=>localStorage.setItem(PK+dt,JSON.stringify(data)));Swal.fire({icon:'success',title:'Berhasil!',timer:1500,showConfirmButton:false}).then(init)}catch{Swal.fire('Gagal','File JSON tidak valid.','error')}};rd.readAsText(file);e.target.value=''}
 
-// ─── SETTINGS ───────────────────────────────
+// ─── SETTINGS ────────────────────────────────
 function goToSetupConfirm(){Swal.fire({title:'Edit Pengaturan?',html:'<p style="font-size:.9rem;color:var(--ink-soft)">Disarankan backup dulu.</p>',icon:'warning',showDenyButton:true,showCancelButton:true,confirmButtonText:'Lanjut',denyButtonText:'Backup Dulu',cancelButtonText:'Batal',confirmButtonColor:'#1a5c5c',denyButtonColor:'#b8922a'}).then(r=>{if(r.isConfirmed)goToSetup();else if(r.isDenied){doBackupJSON();setTimeout(goToSetup,500)}})}
-function goToSetup(){const s=settings();document.getElementById('s-halaqah').value=s.halaqah||'';document.getElementById('s-guru').value=s.guru||'';if(s.metodeProgress)document.getElementById('s-metode').value=s.metodeProgress;const gR=document.querySelector(`input[name="gender"][value="${s.gender||'laki'}"]`);if(gR)gR.checked=true;const rows=document.getElementById('student-rows');rows.innerHTML='';if(s.siswa&&s.siswa.length)s.siswa.forEach(st=>{const o=typeof st==='string'?{nama:st,hafalanAwal:0,targetHafalan:0}:st;addStudentRow(o.nama,o.hafalanAwal,o.targetHafalan)});else addStudentRow();show('pg-setup');hide('pg-app')}
-function clearData(){Swal.fire({title:'Hapus Semua Rekod?',text:'Pengaturan tetap aman.',icon:'warning',showCancelButton:true,confirmButtonColor:'#dc2626',confirmButtonText:'Ya, Hapus',cancelButtonText:'Batal'}).then(r=>{if(r.isConfirmed){localStorage.removeItem(DK);renderDashboard();renderLaporan();Swal.mixin({toast:true,position:'top-end',showConfirmButton:false,timer:1800}).fire({icon:'success',title:'Rekod dihapus!'})}})}
+function goToSetup(){
+  const s=settings();
+  document.getElementById('s-halaqah').value=s.halaqah||'';
+  document.getElementById('s-guru').value=s.guru||'';
+  if(s.metodeProgress){const sel=document.getElementById('s-metode');sel.value=s.metodeProgress;sel.dispatchEvent(new Event('change'))}
+  const gR=document.querySelector(`input[name="gender"][value="${s.gender||'laki'}"]`);
+  if(gR)gR.checked=true;
+  const rows=document.getElementById('student-rows');rows.innerHTML='';
+  if(s.siswa&&s.siswa.length){s.siswa.forEach(st=>{const o=typeof st==='string'?{nama:st,mulaiHafalan:'',hafalanAwal:'',targetHafalan:''}:st;addStudentRow(o.nama,o.mulaiHafalan||'',o.hafalanAwal,o.targetHafalan)})}
+  else addStudentRow();
+  show('pg-setup');hide('pg-app');
+}
+function clearData(){Swal.fire({title:'Hapus Semua Rekod?',text:'Pengaturan & data siswa tetap aman.',icon:'warning',showCancelButton:true,confirmButtonColor:'#dc2626',confirmButtonText:'Ya, Hapus Rekod',cancelButtonText:'Batal'}).then(r=>{if(r.isConfirmed){localStorage.removeItem(DK);renderDashboard();renderLaporan();Swal.mixin({toast:true,position:'top-end',showConfirmButton:false,timer:1800}).fire({icon:'success',title:'Rekod dihapus!'})}})}
+function hardResetApp(){
+  Swal.fire({
+    title:'<span style="font-family:Playfair Display,serif;color:var(--danger)">Reset Total Aplikasi?</span>',
+    html:'<p style="font-size:0.9rem;margin-bottom:12px;color:var(--ink-mid)">Peringatan: Seluruh data santri, riwayat setoran, presensi, dan pengaturan akan <b>DIHAPUS PERMANEN</b>.</p><p style="font-size:0.85rem;font-weight:700;color:var(--danger)">Ketik kata <span style="background:rgba(220,38,38,0.1);padding:2px 6px;border-radius:4px;letter-spacing:1px">HAPUS</span> di bawah ini untuk konfirmasi:</p>',
+    input:'text',inputAttributes:{autocapitalize:'off',autocomplete:'off'},icon:'warning',
+    showCancelButton:true,confirmButtonColor:'#dc2626',cancelButtonColor:'#8c7d6e',
+    confirmButtonText:'Ya, Reset Total',cancelButtonText:'Batal',
+    preConfirm:(inputValue)=>{if(inputValue!=='HAPUS')Swal.showValidationMessage('Anda harus mengetik HAPUS (huruf besar)')}
+  }).then((result)=>{if(result.isConfirmed){localStorage.clear();init();Swal.fire({icon:'success',title:'Aplikasi Direset',showConfirmButton:false,timer:1500})}});
+}
+
+// ─── DYNAMIC METHOD SETUP ────────────────────
+document.getElementById('s-metode').addEventListener('change',function(){
+  const isS=this.value==='surah';
+  document.getElementById('lbl-mulai').textContent=isS?'Mulai (Surah)':'Mulai (Juz)';
+  document.getElementById('lbl-hafalan').textContent='Sdh Hafal';
+  document.getElementById('lbl-target').textContent='Target';
+  const rows=document.querySelectorAll('#student-rows .student-row-grid');
+  rows.forEach(r=>{
+    const inps=r.querySelectorAll('input');
+    if(inps.length>=4){
+      inps[1].type=isS?'text':'number';inps[1].placeholder=isS?'An-Nas':'1';
+      inps[2].type=isS?'text':'number';inps[2].placeholder=isS?'Al-Humazah':'5';
+      inps[3].type=isS?'text':'number';inps[3].placeholder=isS?'Al-Buruj':'15';
+      if(!isS){inps[1].value=parseInt(inps[1].value)||'';inps[2].value=parseInt(inps[2].value)||'';inps[3].value=parseInt(inps[3].value)||''}
+    }
+  });
+});
 
 // Boot
 init();
