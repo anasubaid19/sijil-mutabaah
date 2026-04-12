@@ -166,38 +166,77 @@ label.field-label{display:block;font-size:.75rem;font-weight:700;letter-spacing:
 .swal2-popup{font-family:'Nunito',sans-serif!important;border-radius:20px!important}
 .swal2-title{font-family:'Playfair Display',serif!important}
 
-/* ── STUDENT ROW GRID (FIX) ── */
-.student-row-grid {
-  display: grid;
-  grid-template-columns: 3fr 1fr 1fr 1fr 36px;
-  gap: 8px;
+/* ── STUDENT ACCORDION CARD ── */
+.sc-card {
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  background: var(--white);
+  overflow: hidden;
+  transition: border-color .2s, box-shadow .2s;
+}
+.sc-card.is-open {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(26,92,92,.08);
+}
+/* collapsed summary row */
+.sc-summary {
+  display: flex;
   align-items: center;
-  padding: 10px 12px;
-  background: var(--cream);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  gap: 12px;
+  padding: 12px 14px;
+  cursor: pointer;
+  user-select: none;
 }
-.student-row-grid .field {
-  padding: .55rem .6rem;
-  font-size: .85rem;
+.sc-avatar {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: linear-gradient(135deg,var(--teal-light),var(--cream));
+  border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif;
+  font-weight: 700; font-size: .95rem; color: var(--teal);
+  flex-shrink: 0;
 }
-.student-hdr {
-  display: grid;
-  grid-template-columns: 3fr 1fr 1fr 1fr 36px;
-  gap: 8px;
-  padding: 0 12px;
-  margin-bottom: 6px;
-  font-size: .72rem;
-  font-weight: 700;
-  letter-spacing: .07em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
+.sc-card.is-open .sc-avatar {
+  background: linear-gradient(135deg,var(--teal),var(--teal-dark));
+  color: #fff; border-color: transparent;
 }
-.student-hdr span { text-align: center; }
-.student-hdr span:first-child { text-align: left; }
-
-.row-del-btn{width:32px;height:32px;border-radius:8px;background:none;border:1.5px solid var(--border);color:var(--ink-faint);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all .2s;flex-shrink:0}
-.row-del-btn:hover{border-color:var(--danger);color:var(--danger);background:#fee2e2}
+.sc-info { flex: 1; min-width: 0; }
+.sc-name {
+  font-size: .9rem; font-weight: 700; color: var(--ink);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sc-name.empty { color: var(--ink-faint); font-weight: 400; font-style: italic; }
+.sc-meta {
+  font-size: .72rem; color: var(--ink-soft); margin-top: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sc-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.sc-btn {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--cream); border: 1.5px solid var(--border);
+  color: var(--ink-soft); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .9rem; transition: all .2s; flex-shrink: 0;
+}
+.sc-btn:hover { border-color: var(--teal); color: var(--teal); }
+.sc-btn.del:hover { border-color: var(--danger); color: var(--danger); background: #fee2e2; }
+.sc-btn.chevron i { transition: transform .25s; }
+.sc-card.is-open .sc-btn.chevron i { transform: rotate(180deg); }
+/* expanded form area */
+.sc-form {
+  display: none;
+  padding: 0 14px 14px;
+  border-top: 1px dashed var(--border);
+  margin-top: 0;
+}
+.sc-card.is-open .sc-form { display: block; }
+.sc-form-inner { padding-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+.sc-field-label {
+  font-size: .68rem; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--ink-soft); margin-bottom: 4px; display: block;
+}
+.sc-nums { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.sc-nums .field { text-align: center; }
 .chart-wrap{position:relative;width:100%;max-width:500px;margin:0 auto}
 /* Date input wrapper */
 .date-wrap{position:relative;width:100%}
@@ -308,17 +347,9 @@ div:where(.swal2-container) div:where(.swal2-html-container) { color: var(--ink-
           </div>
         </div>
         
-        <!-- DAFTAR SISWA — GRID LAYOUT (FIXED) -->
+        <!-- DAFTAR SISWA — ACCORDION CARD -->
         <div>
           <label class="field-label">Daftar Siswa</label>
-          <!-- Header Grid -->
-          <div class="student-hdr">
-            <span>Nama Santri</span>
-            <span id="lbl-mulai">Mulai (Juz)</span>
-            <span id="lbl-hafalan">Sdh Hafal</span>
-            <span id="lbl-target">Target</span>
-            <span></span>
-          </div>
           <div id="student-rows" class="space-y-2" data-testid="student-rows"></div>
           <button type="button" onclick="addStudentRow()" class="btn-ghost mt-3 btn-sm" data-testid="add-student-btn"><i class="ph-bold ph-plus"></i> Tambah Siswa</button>
         </div>
@@ -726,65 +757,149 @@ function setupFormAC(inputId, listId) {
 }
 
 // ─── ADD STUDENT ROW (FIXED: CSS Grid) ──────
+// ─── STUDENT ACCORDION CARDS ─────────────────
+function scGetMeta(card){
+  const m=document.getElementById('s-metode').value;
+  const isS=m==='surah';
+  const mV=card.querySelector('.sc-inp-mulai').value.trim();
+  const hV=card.querySelector('.sc-inp-hafal').value.trim();
+  const tV=card.querySelector('.sc-inp-target').value.trim();
+  const parts=[];
+  if(mV) parts.push('Mulai: '+mV);
+  if(hV) parts.push('Hafal: '+hV);
+  if(tV) parts.push('Target: '+tV);
+  return parts.length ? parts.join(' · ') : (isS ? 'Mulai · Hafal · Target' : 'Juz mulai · hafal · target');
+}
+
+function scUpdateSummary(card){
+  const nm=card.querySelector('.sc-inp-nama').value.trim();
+  const nameEl=card.querySelector('.sc-name');
+  const metaEl=card.querySelector('.sc-meta');
+  const avatarEl=card.querySelector('.sc-avatar');
+  if(nm){
+    nameEl.textContent=nm;
+    nameEl.classList.remove('empty');
+    avatarEl.textContent=nm.charAt(0).toUpperCase();
+  } else {
+    nameEl.textContent='Santri baru...';
+    nameEl.classList.add('empty');
+    avatarEl.textContent='+';
+  }
+  metaEl.textContent=scGetMeta(card);
+}
+
+function scToggle(card){
+  const isOpen=card.classList.contains('is-open');
+  // close all
+  document.querySelectorAll('#student-rows .sc-card').forEach(c=>c.classList.remove('is-open'));
+  if(!isOpen) card.classList.add('is-open');
+}
+
 function addStudentRow(nm='',mVal='',h='',t=''){
   const c=document.getElementById('student-rows');
   const i=uid();
-  const r=document.createElement('div');
-  r.className='student-row-grid';
-
   const m=document.getElementById('s-metode').value;
   const isS=m==='surah';
   const tType=isS?'text':'number';
   const p0=isS?'An-Nas':'1';
   const p1=isS?'Al-Humazah':'5';
   const p2=isS?'Al-Buruj':'15';
+  const lbl0=isS?'Mulai':'Mulai (Juz)';
 
-  r.innerHTML=`
-    <input type="text" class="field" placeholder="Nama Santri" value="${esc(nm)}" required data-testid="student-name-${i}">
-    <div class="relative">
-      <input type="${tType}" class="field text-center" placeholder="${p0}" value="${esc(mVal)}" id="m-inp-${i}">
-      <div id="m-ac-${i}" class="autocomplete-list"></div>
+  const card=document.createElement('div');
+  card.className='sc-card'+((!nm)?'' :'');
+  card.innerHTML=`
+    <div class="sc-summary" onclick="scToggle(this.parentElement)">
+      <div class="sc-avatar">${nm ? nm.charAt(0).toUpperCase() : '+'}</div>
+      <div class="sc-info">
+        <div class="sc-name${nm?'':' empty'}">${nm||'Santri baru...'}</div>
+        <div class="sc-meta">${isS?'Mulai · Hafal · Target':'Juz mulai · hafal · target'}</div>
+      </div>
+      <div class="sc-actions">
+        <button type="button" class="sc-btn del" onclick="event.stopPropagation();scDelete(this.closest('.sc-card'))" title="Hapus">
+          <i class="ph-bold ph-trash"></i>
+        </button>
+        <button type="button" class="sc-btn chevron">
+          <i class="ph-bold ph-caret-down"></i>
+        </button>
+      </div>
     </div>
-    <div class="relative">
-      <input type="${tType}" class="field text-center" placeholder="${p1}" value="${esc(h)}" id="h-inp-${i}">
-      <div id="h-ac-${i}" class="autocomplete-list"></div>
+    <div class="sc-form">
+      <div class="sc-form-inner">
+        <div>
+          <span class="sc-field-label">Nama Santri</span>
+          <input type="text" class="field sc-inp-nama" placeholder="Cth: Ahmad Fauzi" value="${esc(nm)}" required data-testid="student-name-${i}"
+            oninput="scUpdateSummary(this.closest('.sc-card'))">
+        </div>
+        <div>
+          <div class="sc-nums">
+            <div>
+              <span class="sc-field-label sc-lbl-mulai">${lbl0}</span>
+              <div class="relative">
+                <input type="${tType}" class="field sc-inp-mulai" placeholder="${p0}" value="${esc(mVal)}" id="m-inp-${i}"
+                  oninput="scUpdateSummary(this.closest('.sc-card'))">
+                <div id="m-ac-${i}" class="autocomplete-list"></div>
+              </div>
+            </div>
+            <div>
+              <span class="sc-field-label">Sdh Hafal</span>
+              <div class="relative">
+                <input type="${tType}" class="field sc-inp-hafal text-center" placeholder="${p1}" value="${esc(h)}" id="h-inp-${i}"
+                  oninput="scUpdateSummary(this.closest('.sc-card'))">
+                <div id="h-ac-${i}" class="autocomplete-list"></div>
+              </div>
+            </div>
+            <div>
+              <span class="sc-field-label">Target</span>
+              <div class="relative">
+                <input type="${tType}" class="field sc-inp-target text-center" placeholder="${p2}" value="${esc(t)}" id="t-inp-${i}"
+                  oninput="scUpdateSummary(this.closest('.sc-card'))">
+                <div id="t-ac-${i}" class="autocomplete-list"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn-primary btn-sm" style="width:auto;align-self:flex-end"
+          onclick="scToggle(this.closest('.sc-card'));scUpdateSummary(this.closest('.sc-card'))">
+          <i class="ph-bold ph-check"></i> Simpan
+        </button>
+      </div>
     </div>
-    <div class="relative">
-      <input type="${tType}" class="field text-center" placeholder="${p2}" value="${esc(t)}" id="t-inp-${i}">
-      <div id="t-ac-${i}" class="autocomplete-list"></div>
-    </div>
-    <button type="button" class="row-del-btn" onclick="delOrClearRow(this)" data-testid="student-delete-${i}" title="Hapus">
-      <i class="ph-bold ph-x"></i>
-    </button>
   `;
-  c.appendChild(r);
+  c.appendChild(card);
   setupFormAC(`m-inp-${i}`,`m-ac-${i}`);
   setupFormAC(`h-inp-${i}`,`h-ac-${i}`);
   setupFormAC(`t-inp-${i}`,`t-ac-${i}`);
+  // update meta jika ada data awal
+  if(nm||mVal||h||t) scUpdateSummary(card);
+  // auto-open jika baru ditambah kosong
+  if(!nm) card.classList.add('is-open');
 }
 
-function delOrClearRow(btn){
+function scDelete(card){
   const c=document.getElementById('student-rows');
   if(c.children.length===1){
-    // Satu-satunya baris: kosongkan field, jangan hapus row-nya
-    btn.parentElement.querySelectorAll('input').forEach(inp=>inp.value='');
+    card.querySelector('.sc-inp-nama').value='';
+    card.querySelector('.sc-inp-mulai').value='';
+    card.querySelector('.sc-inp-hafal').value='';
+    card.querySelector('.sc-inp-target').value='';
+    scUpdateSummary(card);
   } else {
-    btn.parentElement.remove();
+    card.remove();
   }
 }
 
 function getStudentData(){
   const m=document.getElementById('s-metode').value;
   const isS=m==='surah';
-  const rows=document.querySelectorAll('#student-rows .student-row-grid');
+  const cards=document.querySelectorAll('#student-rows .sc-card');
   const s=[];
-  rows.forEach(r=>{
-    const inps=r.querySelectorAll('input');
-    const nm=inps[0].value.trim();
+  cards.forEach(card=>{
+    const nm=card.querySelector('.sc-inp-nama').value.trim();
     if(nm){
-      let mH=inps[1].value.trim();
-      let hA=inps[2].value.trim();
-      let tH=inps[3].value.trim();
+      let mH=card.querySelector('.sc-inp-mulai').value.trim();
+      let hA=card.querySelector('.sc-inp-hafal').value.trim();
+      let tH=card.querySelector('.sc-inp-target').value.trim();
       if(!isS){mH=parseInt(mH)||'';hA=parseInt(hA)||'';tH=parseInt(tH)||'';}
       s.push({nama:nm,mulaiHafalan:mH,hafalanAwal:hA,targetHafalan:tH});
     }
@@ -1186,18 +1301,18 @@ function hardResetApp(){
 // ─── DYNAMIC METHOD SETUP ────────────────────
 document.getElementById('s-metode').addEventListener('change',function(){
   const isS=this.value==='surah';
-  document.getElementById('lbl-mulai').textContent=isS?'Mulai (Surah)':'Mulai (Juz)';
-  document.getElementById('lbl-hafalan').textContent='Sdh Hafal';
-  document.getElementById('lbl-target').textContent='Target';
-  const rows=document.querySelectorAll('#student-rows .student-row-grid');
-  rows.forEach(r=>{
-    const inps=r.querySelectorAll('input');
-    if(inps.length>=4){
-      inps[1].type=isS?'text':'number';inps[1].placeholder=isS?'An-Nas':'1';
-      inps[2].type=isS?'text':'number';inps[2].placeholder=isS?'Al-Humazah':'5';
-      inps[3].type=isS?'text':'number';inps[3].placeholder=isS?'Al-Buruj':'15';
-      if(!isS){inps[1].value=parseInt(inps[1].value)||'';inps[2].value=parseInt(inps[2].value)||'';inps[3].value=parseInt(inps[3].value)||''}
-    }
+  document.querySelectorAll('#student-rows .sc-card').forEach(card=>{
+    const lbl=card.querySelector('.sc-lbl-mulai');
+    if(lbl) lbl.textContent=isS?'Mulai (Surah)':'Mulai (Juz)';
+    ['sc-inp-mulai','sc-inp-hafal','sc-inp-target'].forEach((cls,idx)=>{
+      const phs=[isS?'An-Nas':'1', isS?'Al-Humazah':'5', isS?'Al-Buruj':'15'];
+      const inp=card.querySelector('.'+cls);
+      if(!inp) return;
+      inp.type=isS?'text':'number';
+      inp.placeholder=phs[idx];
+      if(!isS) inp.value=parseInt(inp.value)||'';
+    });
+    scUpdateSummary(card);
   });
 });
 
