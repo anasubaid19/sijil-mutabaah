@@ -137,6 +137,22 @@ label.field-label{display:block;font-size:.75rem;font-weight:700;letter-spacing:
 /* Laporan Cards */
 .laporan-card{background:var(--white);border:1.5px solid var(--border);border-radius:20px;padding:18px;cursor:pointer;transition:all .25s;box-shadow:0 2px 12px var(--shadow)}
 .laporan-card:hover{transform:translateY(-3px);box-shadow:0 8px 30px var(--shadow);border-color:var(--teal)}
+
+/* ── List view ── */
+#laporan-cards.list-view { display:flex !important; flex-direction:column; gap:8px; }
+#laporan-cards.list-view .laporan-card { display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:14px; }
+#laporan-cards.list-view .laporan-card .lc-grid-only { display:none !important; }
+#laporan-cards.list-view .laporan-card .lc-list-avatar { display:flex !important; }
+#laporan-cards.list-view .laporan-card .lc-info { flex:1; min-width:0; }
+#laporan-cards.list-view .laporan-card .lc-info .lc-name { font-size:.9rem; font-weight:700; color:var(--ink); }
+#laporan-cards.list-view .laporan-card .lc-info .lc-meta { font-size:.71rem; color:var(--ink-soft); margin-top:1px; }
+#laporan-cards.list-view .laporan-card .lc-right { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+
+/* ── View toggle button ── */
+.view-toggle { display:flex; border:1.5px solid var(--border); border-radius:10px; overflow:hidden; flex-shrink:0; }
+.view-toggle-btn { width:34px; height:32px; display:flex; align-items:center; justify-content:center; background:none; border:none; color:var(--ink-soft); cursor:pointer; font-size:1rem; transition:all .15s; }
+.view-toggle-btn.active { background:var(--teal); color:#fff; }
+.laporan-card:hover{transform:translateY(-3px);box-shadow:0 8px 30px var(--shadow);border-color:var(--teal)}
 .avatar-lg{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;flex-shrink:0}
 .stat-mini{flex:1;background:var(--cream);border-radius:10px;padding:8px 6px;text-align:center;border:1px solid var(--border)}
 .stat-mini-label{display:block;font-size:.58rem;font-weight:700;letter-spacing:.08em;color:var(--ink-soft);text-transform:uppercase}
@@ -554,7 +570,11 @@ div:where(.swal2-container) div:where(.swal2-html-container) { color: var(--ink-
       <div class="flex items-center gap-3 mb-2">
         <div style="width:36px;height:36px;background:var(--gold-pale);border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--gold)"><i class="ph-bold ph-chart-bar text-lg"></i></div>
         <div class="flex-1"><h2 class="font-display text-lg font-semibold" style="color:var(--ink)">Laporan</h2><div class="gold-line mt-0.5"></div></div>
-        <div class="flex gap-2 flex-wrap justify-end">
+        <div class="flex gap-2 flex-wrap justify-end items-center">
+          <div class="view-toggle" role="group" aria-label="Tampilan kartu">
+            <button class="view-toggle-btn active" id="btn-view-grid" onclick="setLaporanView('grid')" title="Tampilan Grid" aria-pressed="true"><i class="ph-bold ph-squares-four"></i></button>
+            <button class="view-toggle-btn" id="btn-view-list" onclick="setLaporanView('list')" title="Tampilan List" aria-pressed="false"><i class="ph-bold ph-list-bullets"></i></button>
+          </div>
           <button onclick="exportPresensiCSV()" class="btn-ghost btn-sm" style="width:auto;color:#3b82f6;border-color:#3b82f6"><i class="ph-bold ph-clipboard-text"></i> CSV Presensi</button>
           <button onclick="exportCSV()" class="btn-ghost btn-sm" style="width:auto;color:#16a34a;border-color:#16a34a"><i class="ph-bold ph-file-csv"></i> CSV Setoran</button>
           <button onclick="mainExportPDF()" class="btn-gold btn-sm" style="width:auto" data-testid="export-rekap-btn"><i class="ph-bold ph-file-pdf"></i> Rekap PDF</button>
@@ -691,7 +711,7 @@ const MONTHS=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus'
 
 // ─── STATE ──────────────────────────────────
 const SK='sijil_settings_v4',DK='sijil_records_v4',PK='sijil_presensi_';
-let currentTab='dashboard',zEditId=null,mEditId=null,zLintasOn=false,mLintasOn=false,zMutqinOn=false,mMutqinOn=false,modalStudent='',weeklyChart=null,modalChart=null,modalLimit=10;
+let currentTab='dashboard',zEditId=null,mEditId=null,zLintasOn=false,mLintasOn=false,zMutqinOn=false,mMutqinOn=false,modalStudent='',weeklyChart=null,modalChart=null,modalLimit=10,laporanView=localStorage.getItem('laporan_view')||'grid';
 
 // ─── UTILITY ────────────────────────────────
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
@@ -1185,6 +1205,22 @@ function renderWeeklyChart(allR){
 }
 
 // ─── LAPORAN ─────────────────────────────────
+function setLaporanView(v){
+  laporanView=v;
+  localStorage.setItem('laporan_view',v);
+  const c=document.getElementById('laporan-cards');
+  if(!c)return;
+  c.classList.toggle('list-view',v==='list');
+  // Show/hide dual-template sections
+  c.querySelectorAll('.lc-grid-only').forEach(el=>el.style.display=v==='list'?'none':'block');
+  c.querySelectorAll('.lc-list-avatar').forEach(el=>el.style.display=v==='list'?'flex':'none');
+  c.querySelectorAll('.lc-info').forEach(el=>el.style.display=v==='list'?'block':'none');
+  c.querySelectorAll('.lc-right').forEach(el=>el.style.display=v==='list'?'flex':'none');
+  const bg=document.getElementById('btn-view-grid'),bl=document.getElementById('btn-view-list');
+  if(bg){bg.classList.toggle('active',v==='grid');bg.setAttribute('aria-pressed',v==='grid')}
+  if(bl){bl.classList.toggle('active',v==='list');bl.setAttribute('aria-pressed',v==='list')}
+}
+
 function renderLaporan(){
   const s=settings(),allR=records();
   const container=document.getElementById('laporan-cards'),insightDiv=document.getElementById('laporan-insight'),empty=document.getElementById('laporan-empty');
@@ -1202,7 +1238,33 @@ function renderLaporan(){
     const progBar=p.noTarget?'<div class="mt-2 text-center"><span style="color:var(--ink-faint);font-size:0.75rem;font-weight:700">Target belum diset</span></div>':`<div class="progress-wrap mt-2"><div class="progress-fill ${cls}" style="width:${p.pct}%"></div></div>`;
     const div=document.createElement('div');div.className='laporan-card fade-up';div.style.animationDelay=(i*40)+'ms';div.style.animationFillMode='both';
     div.onclick=()=>openModal(nm);div.setAttribute('data-testid','laporan-card-'+i);
-    div.innerHTML=`<div class="flex justify-between items-start"><div class="avatar-lg" style="background:${ab[0]};color:${ab[1]}">${ini}</div>${lastGrade?`<span class="${badgeCls(lastGrade)}">${esc(lastGrade)}</span>`:''}</div><h4 class="font-bold mt-3 truncate" style="color:var(--ink);font-size:.95rem">${esc(nm)}</h4><p class="text-xs mt-0.5 flex items-center gap-1" style="color:var(--ink-soft)"><i class="ph-bold ph-clock text-xs"></i> Update: ${esc(lastDate)}</p><div class="flex gap-2 mt-3"><div class="stat-mini"><span class="stat-mini-label">Setoran</span><span class="stat-mini-value">${count}</span></div><div class="stat-mini"><span class="stat-mini-label">Progress</span><span class="stat-mini-value" style="color:var(--teal)">${progVal}</span></div></div>${progBar}`;
+    // Grid view content
+    div.innerHTML=`
+      <div class="lc-grid-only">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div class="avatar-lg" style="background:${ab[0]};color:${ab[1]};width:44px;height:44px;border-radius:12px">${ini}</div>
+          ${lastGrade?`<span class="${badgeCls(lastGrade)}">${esc(lastGrade)}</span>`:''}
+        </div>
+        <h4 class="font-bold truncate" style="color:var(--ink);font-size:.95rem;margin-top:12px">${esc(nm)}</h4>
+        <p style="font-size:.72rem;margin-top:3px;color:var(--ink-soft)"><i class="ph-bold ph-clock" style="font-size:.65rem"></i> ${esc(lastDate)}</p>
+        <div class="flex gap-2" style="margin-top:12px">
+          <div class="stat-mini"><span class="stat-mini-label">Setoran</span><span class="stat-mini-value">${count}</span></div>
+          <div class="stat-mini"><span class="stat-mini-label">Progress</span><span class="stat-mini-value" style="color:var(--teal)">${progVal}</span></div>
+        </div>
+        ${progBar}
+      </div>
+      <div class="lc-list-avatar" style="display:none;flex-shrink:0">
+        <div class="avatar-lg" style="background:${ab[0]};color:${ab[1]};width:40px;height:40px;border-radius:10px;font-size:.9rem">${ini}</div>
+      </div>
+      <div class="lc-info" style="display:none;flex:1;min-width:0">
+        <div class="lc-name" style="font-size:.9rem;font-weight:700;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(nm)}</div>
+        <div class="lc-meta" style="font-size:.71rem;color:var(--ink-soft);margin-top:1px">${esc(lastDate)} · ${count} setoran</div>
+      </div>
+      <div class="lc-right" style="display:none;align-items:center;gap:8px;flex-shrink:0">
+        <span style="font-size:.82rem;font-weight:700;color:var(--teal)">${progVal}</span>
+        ${lastGrade?`<span class="${badgeCls(lastGrade)}">${esc(lastGrade)}</span>`:''}
+      </div>
+    `;
     container.appendChild(div);
   });
   const now=new Date(),monthStr=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
@@ -1218,6 +1280,9 @@ function renderLaporan(){
   const statusLabel=avgPct>=80?'Target Terlampaui':avgPct>=50?'Dalam Jalur':'Perlu Perhatian';
   const statusColor=avgPct>=80?'#86efac':avgPct>=50?'#fde68a':'#fca5a5';
   const curMonth=MONTHS[now.getMonth()]+' '+now.getFullYear();
+  // Apply current view after render
+  setLaporanView(laporanView);
+
   insightDiv.innerHTML=`<div class="insight-card"><span class="insight-badge">INSIGHT BULANAN</span><div class="flex flex-col sm:flex-row gap-5 mt-4"><div class="flex-1"><h2 class="font-display text-xl sm:text-2xl font-bold text-white leading-tight">Evaluasi Capaian<br>${esc(s.halaqah)}</h2><p class="text-sm mt-3" style="color:rgba(255,255,255,.7)">Rata-rata hafalan santri bulan ini: ${avgPct}%. ${onTrack} dari ${names.length} santri mencapai target mutaba'ah secara konsisten.</p><div class="flex gap-6 mt-5"><div><span class="text-2xl font-bold text-white">${totalSetoran}</span><br><span class="text-xs" style="color:rgba(255,255,255,.5)">TOTAL SETORAN</span></div><div><span class="text-2xl font-bold text-white">${juzSet.size}</span><br><span class="text-xs" style="color:rgba(255,255,255,.5)">SELESAI JUZ</span></div><div><span class="text-2xl font-bold" style="color:var(--gold)">${esc(topGrade)}</span><br><span class="text-xs" style="color:rgba(255,255,255,.5)">PREDIKAT GRUP</span></div></div></div><div class="insight-progress-box" style="min-width:130px"><span class="text-3xl font-bold" style="color:${statusColor}">${avgPct}%</span><span class="text-sm font-bold text-white">${statusLabel}</span><span class="text-xs" style="color:rgba(255,255,255,.5)">${curMonth.toUpperCase()}</span></div></div></div>`;
 }
 
