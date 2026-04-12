@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sijil Mutabaah</title>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -237,6 +237,29 @@ label.field-label{display:block;font-size:.75rem;font-weight:700;letter-spacing:
 }
 .sc-nums { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
 .sc-nums .field { text-align: center; }
+/* ── 16px on inputs: prevents iOS auto-zoom on focus ── */
+.field { font-size: 1rem !important; }
+/* ── Juz auto-calculated field ── */
+.field-auto { background:var(--cream)!important; color:var(--ink-soft)!important; cursor:default; }
+/* ── Presensi chip buttons ── */
+.presensi-chips { display:flex; gap:4px; margin-top:8px; }
+.pchip { flex:1; height:28px; border-radius:7px; font-size:.72rem; font-weight:800; border:1.5px solid var(--border); background:var(--cream); color:var(--ink-soft); cursor:pointer; transition:all .15s; letter-spacing:.04em; }
+.pchip:hover { border-color:var(--teal); color:var(--teal); }
+.pchip.ph { background:var(--teal); border-color:var(--teal); color:#fff; }
+.pchip.pi { background:#3b82f6; border-color:#3b82f6; color:#fff; }
+.pchip.ps { background:#f59e0b; border-color:#f59e0b; color:#fff; }
+.pchip.pa { background:var(--danger); border-color:var(--danger); color:#fff; }
+/* ── Last saved indicator ── */
+.last-saved { display:none; align-items:center; gap:8px; padding:10px 14px; background:var(--teal-light); border:1.5px solid var(--teal); border-radius:12px; margin-top:12px; font-size:.82rem; }
+.last-saved.show { display:flex; animation:fadeUp .3s ease; }
+.last-saved i { color:var(--teal); font-size:1.1rem; flex-shrink:0; }
+/* ── Lintas surah expand button ── */
+.btn-lintas { display:flex; align-items:center; gap:8px; padding:8px 14px; background:var(--teal-light); border:1.5px solid var(--teal); color:var(--teal); border-radius:10px; font-family:'Nunito',sans-serif; font-size:.83rem; font-weight:700; cursor:pointer; transition:all .2s; }
+.btn-lintas:hover { background:var(--teal); color:#fff; }
+.btn-lintas.on { background:var(--teal); color:#fff; }
+/* ── Nav label font-size fix ── */
+.nav-btn { font-size:.625rem !important; }
+.nav-fab-label { font-size:.625rem !important; }
 .chart-wrap{position:relative;width:100%;max-width:500px;margin:0 auto}
 /* Date input wrapper */
 .date-wrap{position:relative;width:100%}
@@ -331,9 +354,9 @@ div:where(.swal2-container) div:where(.swal2-html-container) { color: var(--ink-
         <div class="gold-line mt-3"></div>
       </div>
 
-      <form id="form-setup" class="space-y-4" data-testid="setup-form">
-        <div><label class="field-label">Nama Halaqah</label><input id="s-halaqah" type="text" class="field" placeholder="Cth: Halaqah Abu Bakar" required data-testid="input-halaqah"></div>
-        <div><label class="field-label">Nama Guru / Pengampu</label><input id="s-guru" type="text" class="field" placeholder="Cth: Ustadz Ahmad" required data-testid="input-guru"></div>
+      <form id="form-setup" class="space-y-4" data-testid="setup-form" novalidate>
+        <div><label class="field-label">Nama Halaqah</label><input id="s-halaqah" type="text" class="field" placeholder="Cth: Halaqah Abu Bakar" data-testid="input-halaqah" oninput="this.classList.remove('error')"></div>
+        <div><label class="field-label">Nama Guru / Pengampu</label><input id="s-guru" type="text" class="field" placeholder="Cth: Ustadz Ahmad" data-testid="input-guru" oninput="this.classList.remove('error')"></div>
         <div><label class="field-label">Metode Kalkulasi Progress</label>
           <select id="s-metode" class="field">
             <option value="juz">Berbasis Juz (Target Cth: 30)</option>
@@ -378,9 +401,9 @@ div:where(.swal2-container) div:where(.swal2-html-container) { color: var(--ink-
       </div>
     </div>
     <nav class="sidebar-nav">
-      <button class="sidebar-btn" data-nav="ziyadah" onclick="gotoTab('ziyadah')" data-testid="side-ziyadah" title="Ziyadah"><i class="ph-bold ph-book-open-text"></i> <span>Ziyadah</span></button>
-      <button class="sidebar-btn" data-nav="murajaah" onclick="gotoTab('murajaah')" data-testid="side-murajaah" title="Murajaah"><i class="ph-bold ph-arrows-clockwise"></i> <span>Murajaah</span></button>
       <button class="sidebar-btn active" data-nav="dashboard" onclick="gotoTab('dashboard')" data-testid="side-dashboard" title="Dashboard"><i class="ph-bold ph-squares-four"></i> <span>Dashboard</span></button>
+      <button class="sidebar-btn" data-nav="ziyadah" onclick="gotoTab('ziyadah')" data-testid="side-ziyadah" title="Ziyadah — Hafalan Baru"><i class="ph-bold ph-book-open-text"></i> <span>Ziyadah</span></button>
+      <button class="sidebar-btn" data-nav="murajaah" onclick="gotoTab('murajaah')" data-testid="side-murajaah" title="Murajaah — Ulangan"><i class="ph-bold ph-arrows-clockwise"></i> <span>Murajaah</span></button>
       <button class="sidebar-btn" data-nav="laporan" onclick="gotoTab('laporan')" data-testid="side-laporan" title="Laporan"><i class="ph-bold ph-chart-bar"></i> <span>Laporan</span></button>
       <button class="sidebar-btn" data-nav="pengaturan" onclick="gotoTab('pengaturan')" data-testid="side-pengaturan" title="Pengaturan"><i class="ph-bold ph-gear"></i> <span>Pengaturan</span></button>
     </nav>
@@ -407,7 +430,7 @@ div:where(.swal2-container) div:where(.swal2-html-container) { color: var(--ink-
     <section id="tab-dashboard" class="space-y-5 lg:space-y-0 desktop-grid tab-section" data-testid="tab-dashboard">
       <div class="space-y-5">
         <div class="stats-grid grid grid-cols-2 gap-3" data-testid="stats-grid">
-          <div class="stat-card"><div class="stat-icon" style="background:var(--teal-light);color:var(--teal)"><i class="ph-bold ph-users"></i></div><div><div class="stat-value" style="color:var(--teal)" data-testid="stat-total">0</div><div class="stat-label">Total Siswa</div></div></div>
+          <div class="stat-card"><div class="stat-icon" style="background:var(--teal-light);color:var(--teal)"><i class="ph-bold ph-user-check"></i></div><div><div class="stat-value" style="color:var(--teal);font-size:1.3rem" data-testid="stat-total">0/0</div><div class="stat-label">Kehadiran</div></div></div>
           <div class="stat-card"><div class="stat-icon" style="background:var(--gold-pale);color:var(--gold)"><i class="ph-bold ph-hand-waving"></i></div><div><div class="stat-value" style="color:var(--gold)" data-testid="stat-hadir">0</div><div class="stat-label">Hadir</div></div></div>
           <div class="stat-card"><div class="stat-icon" style="background:#dcfce7;color:#166534"><i class="ph-bold ph-check-circle"></i></div><div><div class="stat-value" style="color:#166534" data-testid="stat-sudah">0</div><div class="stat-label">Sudah Setor</div></div></div>
           <div class="stat-card"><div class="stat-icon" style="background:#fee2e2;color:#991b1b"><i class="ph-bold ph-hourglass"></i></div><div><div class="stat-value" style="color:var(--danger)" data-testid="stat-belum">0</div><div class="stat-label">Belum Setor</div></div></div>
@@ -426,8 +449,8 @@ div:where(.swal2-container) div:where(.swal2-html-container) { color: var(--ink-
           <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
             <h3 class="font-display font-semibold" style="color:var(--ink)"><i class="ph-bold ph-clipboard-text" style="color:var(--teal)"></i> Presensi Hari Ini</h3>
             <div class="flex gap-2">
-              <button onclick="markAllPresent()" class="btn-ghost btn-sm px-2" style="width:auto" data-testid="mark-all-btn" title="Semua Hadir"><i class="ph-bold ph-checks text-lg"></i></button>
-              <button onclick="resetPresensi()" class="btn-ghost btn-sm px-2" style="width:auto;border-color:rgba(220,38,38,.3);color:var(--danger)" data-testid="reset-presensi-btn" title="Reset Presensi"><i class="ph-bold ph-arrow-counter-clockwise text-lg"></i></button>
+              <button onclick="markAllPresent()" class="btn-ghost btn-sm px-2" style="width:auto" data-testid="mark-all-btn" title="Semua Hadir" aria-label="Tandai semua siswa hadir"><i class="ph-bold ph-checks text-lg"></i></button>
+              <button onclick="resetPresensi()" class="btn-ghost btn-sm px-2" style="width:auto;border-color:rgba(220,38,38,.3);color:var(--danger)" data-testid="reset-presensi-btn" title="Reset Presensi" aria-label="Reset presensi hari ini"><i class="ph-bold ph-arrow-counter-clockwise text-lg"></i></button>
             </div>
           </div>
           <div id="presensi-list" class="presensi-grid grid grid-cols-2 gap-2" data-testid="presensi-list"></div>
@@ -437,7 +460,7 @@ div:where(.swal2-container) div:where(.swal2-html-container) { color: var(--ink-
           <div id="dash-progress" class="space-y-3"></div>
         </div>
         <div class="card p-5" data-testid="attention-section">
-          <h3 class="font-display font-semibold mb-3" style="color:var(--danger)"><i class="ph-bold ph-warning"></i> Siswa Perlu Perhatian</h3>
+          <h3 class="font-display font-semibold mb-3" style="color:#b45309"><i class="ph-bold ph-clock"></i> Siswa Perlu Perhatian</h3>
           <div id="dash-attention" class="space-y-2"></div>
         </div>
       </div>
@@ -461,12 +484,11 @@ div:where(.swal2-container) div:where(.swal2-html-container) { color: var(--ink-
             <div><label class="field-label">Ayat</label><input id="z-ayat-a" type="text" class="field" placeholder="1-5" required data-testid="z-ayat-a"></div>
           </div>
           <div class="flex items-center justify-between py-1 flex-wrap gap-3">
+            <button type="button" class="btn-lintas" id="z-lintas" onclick="toggleLintas('z')" data-testid="z-lintas" aria-expanded="false">
+              <i class="ph-bold ph-plus-circle" id="z-lintas-icon"></i> Hafalan lintas beberapa surah
+            </button>
             <div class="flex items-center gap-3">
-              <div class="toggle-track" id="z-lintas" onclick="toggleLintas('z')" data-testid="z-lintas"><div class="toggle-knob"></div></div>
-              <span class="text-sm font-semibold" style="color:var(--ink-mid)">Lintas surah?</span>
-            </div>
-            <div class="flex items-center gap-3">
-              <div class="toggle-track" id="z-mutqin" onclick="toggleMutqin('z')" data-testid="z-mutqin"><div class="toggle-knob"></div></div>
+              <div class="toggle-track" id="z-mutqin" onclick="toggleMutqin('z')" data-testid="z-mutqin" aria-label="Tandai Mutqin"><div class="toggle-knob"></div></div>
               <span class="text-sm font-bold flex items-center gap-1" style="color:var(--gold)"><i class="ph-fill ph-star"></i> Mutqin</span>
             </div>
           </div>
@@ -475,12 +497,13 @@ div:where(.swal2-container) div:where(.swal2-html-container) { color: var(--ink-
             <div><label class="field-label">Ayat</label><input id="z-ayat-b" type="text" class="field" placeholder="10" data-testid="z-ayat-b"></div>
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            <div><label class="field-label">Juz</label><input id="z-juz" type="text" class="field" placeholder="30" required data-testid="z-juz"></div>
+            <div><label class="field-label">Juz <span style="font-size:.6rem;background:var(--teal-light);color:var(--teal);padding:1px 6px;border-radius:4px;font-weight:800;letter-spacing:.05em">AUTO</span></label><input id="z-juz" type="text" class="field field-auto" placeholder="—" readonly data-testid="z-juz"></div>
             <div><label class="field-label">Nilai</label><select id="z-gred" required class="field" data-testid="z-gred"><option value="Mumtaz">Mumtaz (A)</option><option value="Jayyid Jiddan">Jayyid Jiddan (B)</option><option value="Jayyid">Jayyid (C)</option><option value="Maqbul">Maqbul (D)</option></select></div>
             <div class="col-span-2 sm:col-span-1"><label class="field-label">Catatan</label><input id="z-catatan" type="text" class="field" placeholder="Opsional" data-testid="z-catatan"></div>
           </div>
           <button type="submit" class="btn-primary mt-2" data-testid="z-submit"><i class="ph-bold ph-floppy-disk"></i><span id="z-btn-text">Simpan Ziyadah</span></button>
         </form>
+        <div id="z-last-saved" class="last-saved"><i class="ph-fill ph-check-circle"></i><div id="z-last-saved-text" style="font-size:.83rem;color:var(--ink)"></div></div>
       </div>
     </section>
 
@@ -503,12 +526,11 @@ div:where(.swal2-container) div:where(.swal2-html-container) { color: var(--ink-
             <div><label class="field-label">Ayat</label><input id="m-ayat-a" type="text" class="field" placeholder="1-5" required data-testid="m-ayat-a"></div>
           </div>
           <div class="flex items-center justify-between py-1 flex-wrap gap-3">
+            <button type="button" class="btn-lintas" id="m-lintas" onclick="toggleLintas('m')" data-testid="m-lintas" aria-expanded="false">
+              <i class="ph-bold ph-plus-circle" id="m-lintas-icon"></i> Hafalan lintas beberapa surah
+            </button>
             <div class="flex items-center gap-3">
-              <div class="toggle-track" id="m-lintas" onclick="toggleLintas('m')" data-testid="m-lintas"><div class="toggle-knob"></div></div>
-              <span class="text-sm font-semibold" style="color:var(--ink-mid)">Lintas surah?</span>
-            </div>
-            <div class="flex items-center gap-3">
-              <div class="toggle-track" id="m-mutqin" onclick="toggleMutqin('m')" data-testid="m-mutqin"><div class="toggle-knob"></div></div>
+              <div class="toggle-track" id="m-mutqin" onclick="toggleMutqin('m')" data-testid="m-mutqin" aria-label="Tandai Mutqin"><div class="toggle-knob"></div></div>
               <span class="text-sm font-bold flex items-center gap-1" style="color:var(--gold)"><i class="ph-fill ph-star"></i> Mutqin</span>
             </div>
           </div>
@@ -517,12 +539,13 @@ div:where(.swal2-container) div:where(.swal2-html-container) { color: var(--ink-
             <div><label class="field-label">Ayat</label><input id="m-ayat-b" type="text" class="field" placeholder="10" data-testid="m-ayat-b"></div>
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            <div><label class="field-label">Juz</label><input id="m-juz" type="text" class="field" placeholder="30" required data-testid="m-juz"></div>
+            <div><label class="field-label">Juz <span style="font-size:.6rem;background:var(--gold-pale);color:var(--gold);padding:1px 6px;border-radius:4px;font-weight:800;letter-spacing:.05em">AUTO</span></label><input id="m-juz" type="text" class="field field-auto" placeholder="—" readonly data-testid="m-juz"></div>
             <div><label class="field-label">Nilai</label><select id="m-gred" required class="field" data-testid="m-gred"><option value="Mumtaz">Mumtaz (A)</option><option value="Jayyid Jiddan">Jayyid Jiddan (B)</option><option value="Jayyid">Jayyid (C)</option><option value="Maqbul">Maqbul (D)</option></select></div>
             <div class="col-span-2 sm:col-span-1"><label class="field-label">Catatan</label><input id="m-catatan" type="text" class="field" placeholder="Opsional" data-testid="m-catatan"></div>
           </div>
           <button type="submit" class="btn-primary mt-2" data-testid="m-submit"><i class="ph-bold ph-floppy-disk"></i><span id="m-btn-text">Simpan Murajaah</span></button>
         </form>
+        <div id="m-last-saved" class="last-saved"><i class="ph-fill ph-check-circle"></i><div id="m-last-saved-text" style="font-size:.83rem;color:var(--ink)"></div></div>
       </div>
     </section>
 
@@ -560,9 +583,9 @@ div:where(.swal2-container) div:where(.swal2-html-container) { color: var(--ink-
   <!-- BOTTOM NAV -->
   <nav class="bottom-nav" data-testid="bottom-nav">
     <div class="flex items-end max-w-md mx-auto">
-      <button class="nav-btn" data-nav="ziyadah" onclick="gotoTab('ziyadah')" data-testid="nav-ziyadah"><i class="ph-bold ph-book-open-text"></i><span>Ziyadah</span></button>
-      <button class="nav-btn" data-nav="murajaah" onclick="gotoTab('murajaah')" data-testid="nav-murajaah"><i class="ph-bold ph-arrows-clockwise"></i><span>Murajaah</span></button>
-      <div class="nav-fab-wrap active" data-nav="dashboard" onclick="gotoTab('dashboard')" data-testid="nav-dashboard"><div class="nav-fab"><i class="ph-bold ph-squares-four"></i></div><div class="nav-fab-label">Dashboard</div></div>
+      <button class="nav-btn" data-nav="dashboard" onclick="gotoTab('dashboard')" data-testid="nav-dashboard"><i class="ph-bold ph-squares-four"></i><span>Dashboard</span></button>
+      <button class="nav-btn" data-nav="murajaah" onclick="gotoTab('murajaah')" data-testid="nav-murajaah"><i class="ph-bold ph-arrows-clockwise"></i><span>Ulangan</span></button>
+      <div class="nav-fab-wrap" data-nav="ziyadah" onclick="gotoTab('ziyadah')" data-testid="nav-ziyadah"><div class="nav-fab"><i class="ph-bold ph-book-open-text"></i></div><div class="nav-fab-label">Ziyadah</div></div>
       <button class="nav-btn" data-nav="laporan" onclick="gotoTab('laporan')" data-testid="nav-laporan"><i class="ph-bold ph-chart-bar"></i><span>Laporan</span></button>
       <button class="nav-btn" data-nav="pengaturan" onclick="gotoTab('pengaturan')" data-testid="nav-pengaturan"><i class="ph-bold ph-gear"></i><span>Pengaturan</span></button>
     </div>
@@ -828,7 +851,7 @@ function addStudentRow(nm='',mVal='',h='',t=''){
       <div class="sc-form-inner">
         <div>
           <span class="sc-field-label">Nama Santri</span>
-          <input type="text" class="field sc-inp-nama" placeholder="Cth: Ahmad Fauzi" value="${esc(nm)}" required data-testid="student-name-${i}"
+          <input type="text" class="field sc-inp-nama" placeholder="Cth: Ahmad Fauzi" value="${esc(nm)}" data-testid="student-name-${i}"
             oninput="scUpdateSummary(this.closest('.sc-card'))">
         </div>
         <div>
@@ -934,7 +957,40 @@ function continueInit(){
   document.getElementById('m-tarikh').value=todayStr();
   gotoTab('dashboard');
 }
-document.getElementById('form-setup').addEventListener('submit',function(e){e.preventDefault();const h=document.getElementById('s-halaqah').value.trim(),g=document.getElementById('s-guru').value.trim(),gd=document.querySelector('input[name="gender"]:checked').value,mp=document.getElementById('s-metode').value,ss=getStudentData();if(!ss.length)return Swal.fire('Perhatian','Minimal 1 siswa','warning');saveSets({halaqah:h,guru:g,gender:gd,metodeProgress:mp,siswa:ss});Swal.fire({icon:'success',title:'Siap!',timer:1200,showConfirmButton:false}).then(continueInit)});
+document.getElementById('form-setup').addEventListener('submit',function(e){
+  e.preventDefault();
+  // JS validation (form has novalidate)
+  const h=document.getElementById('s-halaqah').value.trim();
+  const g=document.getElementById('s-guru').value.trim();
+  if(!h){
+    const el=document.getElementById('s-halaqah');
+    el.classList.add('error');el.focus();
+    Swal.fire({icon:'warning',title:'Isi Nama Halaqah',text:'Nama halaqah tidak boleh kosong.',timer:2000,showConfirmButton:false});
+    return;
+  }
+  if(!g){
+    const el=document.getElementById('s-guru');
+    el.classList.add('error');el.focus();
+    Swal.fire({icon:'warning',title:'Isi Nama Guru',text:'Nama guru tidak boleh kosong.',timer:2000,showConfirmButton:false});
+    return;
+  }
+  const gd=document.querySelector('input[name="gender"]:checked').value;
+  const mp=document.getElementById('s-metode').value;
+  const ss=getStudentData();
+  if(!ss.length){
+    Swal.fire({icon:'warning',title:'Perhatian',text:'Minimal 1 siswa harus diisi.',showConfirmButton:true});
+    return;
+  }
+  try {
+    saveSets({halaqah:h,guru:g,gender:gd,metodeProgress:mp,siswa:ss});
+  } catch(err) {
+    Swal.fire({icon:'error',title:'Gagal Menyimpan',text:'Tidak dapat menyimpan data: '+err.message});
+    return;
+  }
+  // Navigate without relying on .then()
+  Swal.fire({icon:'success',title:'Siap!',timer:1000,showConfirmButton:false});
+  setTimeout(continueInit, 1100);
+});
 
 // ─── DROPDOWN ────────────────────────────────
 function fillDropdown(id,list){const sel=document.getElementById(id);if(!sel)return;sel.innerHTML='<option value="" disabled selected>-- Pilih Santri --</option>';if(list)[...list].sort().forEach(n=>sel.insertAdjacentHTML('beforeend',`<option value="${esc(n)}">${esc(n)}</option>`))}
@@ -966,8 +1022,24 @@ function updateJuz(p){const saEl=document.getElementById(p+'-surah-a'),aaEl=docu
 
 // ─── LINTAS & MUTQIN ─────────────────────────
 function toggleLintas(p){
-  if(p==='z'){zLintasOn=!zLintasOn;document.getElementById('z-lintas').classList.toggle('on',zLintasOn);document.getElementById('z-blok-lintas').classList.toggle('hidden',!zLintasOn);if(!zLintasOn){document.getElementById('z-surah-b').value='';document.getElementById('z-ayat-b').value='';document.getElementById('z-surah-b').removeAttribute('required');document.getElementById('z-ayat-b').removeAttribute('required')}else{document.getElementById('z-surah-b').setAttribute('required','true');document.getElementById('z-ayat-b').setAttribute('required','true')}}
-  else{mLintasOn=!mLintasOn;document.getElementById('m-lintas').classList.toggle('on',mLintasOn);document.getElementById('m-blok-lintas').classList.toggle('hidden',!mLintasOn);if(!mLintasOn){document.getElementById('m-surah-b').value='';document.getElementById('m-ayat-b').value='';document.getElementById('m-surah-b').removeAttribute('required');document.getElementById('m-ayat-b').removeAttribute('required')}else{document.getElementById('m-surah-b').setAttribute('required','true');document.getElementById('m-ayat-b').setAttribute('required','true')}}
+  const pf=p==='z';
+  if(pf){
+    zLintasOn=!zLintasOn;
+    const btn=document.getElementById('z-lintas'),ico=document.getElementById('z-lintas-icon');
+    if(btn){btn.classList.toggle('on',zLintasOn);btn.setAttribute('aria-expanded',zLintasOn)}
+    if(ico)ico.className=zLintasOn?'ph-bold ph-minus-circle':'ph-bold ph-plus-circle';
+    document.getElementById('z-blok-lintas').classList.toggle('hidden',!zLintasOn);
+    if(!zLintasOn){document.getElementById('z-surah-b').value='';document.getElementById('z-ayat-b').value='';document.getElementById('z-surah-b').removeAttribute('required');document.getElementById('z-ayat-b').removeAttribute('required')}
+    else{document.getElementById('z-surah-b').setAttribute('required','true');document.getElementById('z-ayat-b').setAttribute('required','true')}
+  } else {
+    mLintasOn=!mLintasOn;
+    const btn=document.getElementById('m-lintas'),ico=document.getElementById('m-lintas-icon');
+    if(btn){btn.classList.toggle('on',mLintasOn);btn.setAttribute('aria-expanded',mLintasOn)}
+    if(ico)ico.className=mLintasOn?'ph-bold ph-minus-circle':'ph-bold ph-plus-circle';
+    document.getElementById('m-blok-lintas').classList.toggle('hidden',!mLintasOn);
+    if(!mLintasOn){document.getElementById('m-surah-b').value='';document.getElementById('m-ayat-b').value='';document.getElementById('m-surah-b').removeAttribute('required');document.getElementById('m-ayat-b').removeAttribute('required')}
+    else{document.getElementById('m-surah-b').setAttribute('required','true');document.getElementById('m-ayat-b').setAttribute('required','true')}
+  }
   updateJuz(p);
 }
 function toggleMutqin(p){
@@ -981,7 +1053,7 @@ function gotoTab(t){
   if(currentTab==='murajaah'&&t!=='murajaah')resetForm('m');
   currentTab=t;
   ['dashboard','ziyadah','murajaah','laporan','pengaturan'].forEach(k=>{const el=document.getElementById('tab-'+k);if(el)el.classList.toggle('hidden',k!==t)});
-  document.querySelectorAll('[data-nav]').forEach(el=>{const nav=el.dataset.nav;if(el.classList.contains('nav-fab-wrap')){el.classList.toggle('active',nav===t)}else{el.classList.toggle('active',nav===t)}});
+  document.querySelectorAll('[data-nav]').forEach(el=>{el.classList.toggle('active',el.dataset.nav===t)});
   if(t==='dashboard')renderDashboard();
   if(t==='laporan')renderLaporan();
 }
@@ -993,8 +1065,8 @@ function resetForm(p){
   if(p==='m'&&mLintasOn)toggleLintas('m');
   if(p==='z'&&zMutqinOn)toggleMutqin('z');
   if(p==='m'&&mMutqinOn)toggleMutqin('m');
-  if(p==='z'){zEditId=null;document.getElementById('z-edit-banner').classList.remove('show');document.getElementById('z-btn-text').textContent='Simpan Ziyadah'}
-  if(p==='m'){mEditId=null;document.getElementById('m-edit-banner').classList.remove('show');document.getElementById('m-btn-text').textContent='Simpan Murajaah'}
+  if(p==='z'){zEditId=null;document.getElementById('z-edit-banner').classList.remove('show');document.getElementById('z-btn-text').textContent='Simpan Ziyadah';const n=document.getElementById('z-nama');if(n)n.selectedIndex=0;}
+  if(p==='m'){mEditId=null;document.getElementById('m-edit-banner').classList.remove('show');document.getElementById('m-btn-text').textContent='Simpan Murajaah';const n=document.getElementById('m-nama');if(n)n.selectedIndex=0;}
 }
 function cancelEdit(p){resetForm(p)}
 
@@ -1013,7 +1085,15 @@ function handleSubmit(p,e){
   let data=records(),editId=p==='z'?zEditId:mEditId;
   if(editId){const idx=data.findIndex(d=>d.id===editId);if(idx>-1)data[idx]={...data[idx],...entry};Swal.fire({icon:'success',title:'Diperbarui!',timer:900,showConfirmButton:false})}
   else{data.push({...entry,id:uid(),ts:Date.now()});Swal.fire({icon:'success',title:'Tersimpan!',timer:900,showConfirmButton:false})}
-  saveRecs(data);resetForm(p);renderDashboard();
+  saveRecs(data);
+  // Show last-saved indicator
+  const lsEl=document.getElementById(p+'-last-saved');
+  const lsTxt=document.getElementById(p+'-last-saved-text');
+  if(lsEl&&lsTxt){
+    lsTxt.innerHTML=`<strong>${esc(entry.nama)}</strong> &mdash; ${esc(entry.surah)} · Juz ${esc(entry.juz)} · <span style="color:var(--teal);font-weight:700">${esc(entry.gred)}</span>`;
+    lsEl.classList.add('show');
+  }
+  resetForm(p);renderDashboard();
 }
 document.getElementById('z-form').addEventListener('submit',e=>handleSubmit('z',e));
 document.getElementById('m-form').addEventListener('submit',e=>handleSubmit('m',e));
@@ -1022,7 +1102,7 @@ document.getElementById('m-form').addEventListener('submit',e=>handleSubmit('m',
 // ─── PRESENSI ────────────────────────────────
 function getPresensi(date){const p=JSON.parse(localStorage.getItem(PK+date)||'{}');for(let k in p){if(p[k]===true)p[k]='hadir';else if(!['hadir','izin','sakit','alpha'].includes(p[k]))delete p[k]}return p}
 function savePresensi(date,data){localStorage.setItem(PK+date,JSON.stringify(data))}
-function updatePresensiItem(nama,val){const d=todayStr(),p=getPresensi(d);if(val)p[nama]=val;else delete p[nama];savePresensi(d,p);renderDashboard()}
+function updatePresensiItem(nama,val){const d=todayStr(),p=getPresensi(d);if(p[nama]===val)delete p[nama];else if(val)p[nama]=val;else delete p[nama];savePresensi(d,p);renderDashboard()}
 function markAllPresent(){const s=settings();if(!s)return;const d=todayStr(),p=getPresensi(d);getSiswaNames(s).forEach(n=>p[n]='hadir');savePresensi(d,p);renderDashboard()}
 function resetPresensi(){const d=todayStr();savePresensi(d,{});renderDashboard()}
 
@@ -1058,7 +1138,7 @@ function renderDashboard(){
   const setorNames=new Set(todayR.map(r=>r.nama));
   const sudahSetor=hadirNames.filter(n=>setorNames.has(n));
   const belumSetor=hadirNames.filter(n=>!setorNames.has(n));
-  document.querySelector('[data-testid="stat-total"]').textContent=names.length;
+  document.querySelector('[data-testid="stat-total"]').textContent=hadirNames.length+'/'+names.length;
   document.querySelector('[data-testid="stat-hadir"]').textContent=hadirNames.length;
   document.querySelector('[data-testid="stat-sudah"]').textContent=sudahSetor.length;
   document.querySelector('[data-testid="stat-belum"]').textContent=belumSetor.length;
@@ -1066,7 +1146,8 @@ function renderDashboard(){
   pl.innerHTML='';
   names.sort().forEach((nm,i)=>{
     const st=pres[nm];const sVal=st||'';
-    pl.insertAdjacentHTML('beforeend',`<div class="presensi-item ${sVal}" data-testid="presensi-${i}"><div style="display:flex;align-items:center;gap:8px"><div class="avatar" style="width:26px;height:26px;border-radius:7px;font-size:.7rem;flex-shrink:0">${esc(nm).charAt(0).toUpperCase()}</div><span style="font-size:.85rem;font-weight:700;color:var(--ink);word-break:break-word;line-height:1.3">${esc(nm)}</span></div><select class="presensi-select" onchange="updatePresensiItem('${esc(nm).replace(/'/g,"\\'")}', this.value)"><option value="" ${!sVal?'selected':''}>— Status —</option><option value="hadir" ${sVal==='hadir'?'selected':''}>✓ Hadir</option><option value="izin" ${sVal==='izin'?'selected':''}>📋 Izin</option><option value="sakit" ${sVal==='sakit'?'selected':''}>🤒 Sakit</option><option value="alpha" ${sVal==='alpha'?'selected':''}>✗ Alpha</option></select></div>`);
+    const es=nm.replace(/'/g,"\\'");
+    pl.insertAdjacentHTML('beforeend',`<div class="presensi-item ${sVal}" data-testid="presensi-${i}" style="padding:10px 12px"><div style="display:flex;align-items:center;gap:8px"><div class="avatar" style="width:26px;height:26px;border-radius:7px;font-size:.7rem;flex-shrink:0">${esc(nm).charAt(0).toUpperCase()}</div><span style="font-size:.85rem;font-weight:700;color:var(--ink);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(nm)}</span></div><div class="presensi-chips"><button type="button" class="pchip ${sVal==='hadir'?'ph':''}" onclick="updatePresensiItem('${es}','hadir')" title="Hadir" aria-pressed="${sVal==='hadir'}">H</button><button type="button" class="pchip ${sVal==='izin'?'pi':''}" onclick="updatePresensiItem('${es}','izin')" title="Izin" aria-pressed="${sVal==='izin'}">I</button><button type="button" class="pchip ${sVal==='sakit'?'ps':''}" onclick="updatePresensiItem('${es}','sakit')" title="Sakit" aria-pressed="${sVal==='sakit'}">S</button><button type="button" class="pchip ${sVal==='alpha'?'pa':''}" onclick="updatePresensiItem('${es}','alpha')" title="Alpha" aria-pressed="${sVal==='alpha'}">A</button></div></div>`);
   });
   renderWeeklyChart(allR);
   const progDiv=document.getElementById('dash-progress');
@@ -1085,9 +1166,9 @@ function renderDashboard(){
   const attention=names.filter(nm=>{const recs=allR.filter(r=>r.nama===nm);if(!recs.some(r=>r.tarikh>=threeStr))return true;const p=calcProgress(nm,s);return !p.noTarget&&p.pct<30});
   if(!attention.length){attDiv.innerHTML='<p class="text-sm" style="color:var(--ink-soft)">Semua siswa dalam performa baik!</p>'}
   else{let h='';attention.forEach(nm=>{const p=calcProgress(nm,s),last=allR.filter(r=>r.nama===nm).sort((a,b)=>(b.ts||0)-(a.ts||0))[0],lastD=last?relativeTime(last.ts||Date.now()):'Belum pernah setor';
-    const progBar=p.noTarget?'<span style="color:var(--ink-faint);font-size:0.75rem;font-weight:700;display:block;margin-top:4px">Target belum diset</span>':`<div class="progress-wrap mt-1"><div class="progress-fill low" style="width:${p.pct}%"></div></div>`;
+    const progBar=p.noTarget?'<span style="color:var(--ink-faint);font-size:0.75rem;font-weight:700;display:block;margin-top:4px">Target belum diset</span>':`<div class="progress-wrap mt-1"><div class="progress-fill gold" style="width:${p.pct}%"></div></div>`;
     const pctText=p.noTarget?'':` · ${p.pct}%`;
-    h+=`<div class="flex items-center gap-3 p-3 rounded-xl" style="background:linear-gradient(135deg,#fef2f2,#fecaca);border:1px solid #fca5a5"><div class="avatar" style="width:30px;height:30px;border-radius:8px;font-size:.75rem;background:linear-gradient(135deg,var(--danger),#991b1b)">${esc(nm).charAt(0).toUpperCase()}</div><div class="flex-1 min-w-0"><p class="text-sm font-semibold truncate" style="color:var(--ink)">${esc(nm)}</p><p class="text-xs" style="color:var(--ink-soft)">Terakhir: ${lastD}${pctText}</p>${progBar}</div></div>`});
+    h+=`<div class="flex items-center gap-3 p-3 rounded-xl" style="background:linear-gradient(135deg,#fffbeb,#fde68a);border:1px solid #f59e0b"><div class="avatar" style="width:30px;height:30px;border-radius:8px;font-size:.75rem;background:linear-gradient(135deg,#f59e0b,#b45309)">${esc(nm).charAt(0).toUpperCase()}</div><div class="flex-1 min-w-0"><p class="text-sm font-semibold truncate" style="color:var(--ink)">${esc(nm)}</p><p class="text-xs" style="color:var(--ink-soft)">Terakhir: ${lastD}${pctText}</p>${progBar}</div></div>`});
     attDiv.innerHTML=h}
 }
 
